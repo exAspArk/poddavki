@@ -49,11 +49,10 @@ player_checker_current(X1, Y1, X2, Y2):-
   Y is Y1 + SDy,                           % Y = ++Y1 (или --Y1)
   player_checker_current(X, Y, X2, Y2, 1).
                            
-% ход шашки игрока ХЗ пока                                    
+% ход шашки игрока                                  
 player_checker_current(X1, Y1, X2, Y2, 1):-
   not(X1 = X2),
-  (computer_figure(X1, Y1);
-player_figure(X1, Y1)),
+  (computer_figure(X1, Y1) ; player_figure(X1, Y1)),
   !.
 player_checker_current(X1, Y1, X2, Y2, 1):-
   not(X1 = X2),
@@ -107,7 +106,7 @@ player_remove_all([]):-
   !.
 player_remove_all([[X, Y] | T]):-
   retract(computer_figure(X, Y)),
-  (retract(computer_king(X, Y)); !),
+  (retract(computer_king(X, Y)) ; !),
   player_remove_all(T).
 
 % съедать шашкой пока не наестся
@@ -174,9 +173,9 @@ player_can_move(X1, Y1, X2, Y2):-
 % игрок может съесть кого-нибудь
 player_need_to_kill:-
   player_figure(X, Y),
-  (player_checker_can_kill(X, Y, []); (player_king_can_kill(X, Y, []), player_king(X, Y))).
+  (player_checker_can_kill(X, Y, []) ; (player_king_can_kill(X, Y, []), player_king(X, Y))).
 
-% компьютер может бить, ходя из (X1, Y1) в (X2, Y2), съедая (Cx1, Cy1) ШАШКА ХЗ
+% компьютер может бить, ходя из (X1, Y1) в (X2, Y2), съедая (Cx1, Cy1)
 computer_need_kill(X1, Y1, X2, Y2, Cx1, Cy1):-
   player_figure(Cx1, Cy1),
   Dx is Cx1 - X1,
@@ -344,6 +343,6 @@ computer_remove_all([[X, Y] | T]):-
 
 % условия победы
 computer_win:-
-  not(computer_figure(_, _)).
+  (not(player_can_move) ; not(computer_figure(_, _)).
 player_win:-
-  not(player_figure(_, _)).
+  (not(computer_move) ; not(player_figure(_, _))).
