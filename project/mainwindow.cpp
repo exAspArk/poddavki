@@ -7,6 +7,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     //кодировка
     QTextCodec::setCodecForTr(QTextCodec::codecForName("CP1251"));
 
+    //обнуление шашек
+    draughts = new CheckerState * [8];
+    for(int i = 0; i < 8; i++)
+        draughts[i] = new CheckerState[8];
+
+    //передаём шашки в отрисовку
+    this->picture->setDraughts(this->draughts);
+
 	// Signal-Slots
     connect(actionExit, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -26,32 +34,45 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::startNewGame() {
-    /*QSettings settings("Arceny","QCheckers");
-	actionStartNewGame->setEnabled(false);
-	int type = settings.value("type",RUSSIAN).toInt();
-	int color = settings.value("color",WHITE).toInt();
-	int level = settings.value("depth",3).toInt();
-	std::cout << type << " " << color << "\n"; std::cout.flush();
-	if(color == WHITE)
-		color = BLACK;
-	else
-		color = WHITE;
-	game->setGameType(type);
-	picture->setComputerColor(color);
-	game->setMaxLevel(level);
-	game->startNewGame(color);
+    //выключаем кнопку начала новой игры
+    actionStartNewGame->setEnabled(false);
 
-	actionEndGame->setEnabled(true);
-	goFirst->setEnabled(true);
-	goLast->setEnabled(true);
-	goPrev->setEnabled(true);
-    goNext->setEnabled(true);*/
+    int i = 0, j = 0;
+    //обнуляем значения из базы
+    for(i = 0; i < 8; i++)
+        for(j = 0; j < 8; j++)
+            draughts[i][j] = NONE;
+
+    //записываем данные о пешках в начальном состоянии
+    for(i = 0; i < 8; i++)
+    {
+        for(j = 0; j < 3; j++)
+            if((i + j) % 2 == 0)
+                draughts[i][j] = BLACK;
+        for(j = 5; j < 8; j++)
+            if((i + j) % 2 == 0)
+                draughts[i][j] = WHITE;
+    }
+
+    //обновляем поле
+    this->picture->update();
+
+    //включаем кнопку выключения игры
+    actionEndGame->setEnabled(true);
 }
 
 void MainWindow::endGame() {
+    //обратные действия с кнопками
 	actionEndGame->setEnabled(false);
-    //picture->clear();
-	actionStartNewGame->setEnabled(true);
+    actionStartNewGame->setEnabled(true);
+
+    //обнуляем значения из базы
+    for(int i = 0; i < 8; i++)
+        for(int j = 0; j < 8; j++)
+            draughts[i][j] = NONE;
+
+    //обновляем поле
+    this->picture->update();
 }
 
 void MainWindow::gameEnded(uint8 status) {

@@ -21,6 +21,11 @@ CheckersPicture::~CheckersPicture()
 
 }
 
+void CheckersPicture::setDraughts(CheckerState ** _draughts)
+{
+    this->draughts = _draughts;
+}
+
 void CheckersPicture::mousePressEvent(QMouseEvent *event)
 {
     /*
@@ -65,71 +70,73 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
             QRect rect = pixelRect(i, j);
             if( !((i+j%2)%2) ) {
                     painter.fillRect(rect, dark);
-                    //painter.drawEllipse(QPoint(zoom*(i+1),zoom*(10-j)),s,s);
             } else {
                 painter.fillRect(rect, Qt::white);
             }
         }
     }
 
-    int ix,jx;
-//	QColor endColor(0x4c,0x4c,0xcc);
+    int ix = 0, jx = 0;  //???
     QColor endColor(0x90,0x00,0x90);
     QColor startColor(0x33,0xff,0x00);
     QColor capturedColor(0xff,0x33,0x33);
     QColor normalColor(0x4c,0x4c,0xcc);
-    /*if(v.size()) {
-        int type;
-        for(unsigned i=0; i< v.size(); i++) {
-            color==WHITE ? jx = n-1-v.at(i).y : jx = v.at(i).y;
-            color==WHITE ? ix = n-1-v.at(i).x : ix = v.at(i).x;
-            QRect rect = pixelRect(ix, jx);
-            type = v.at(i).type;
-            if(type == MOVEDFROM)
-                painter.fillRect(rect, startColor);
-            else if(type == MOVEDTO || type == TOKING)
-                painter.fillRect(rect, endColor);
-            else if(type == MOVEDTHROUGH)
-                painter.fillRect(rect, normalColor);
-            else if(type == DELETED)
-                painter.fillRect(rect, capturedColor);
-        }
-    }
 
     int s = zoom*0.4;
     int sd = zoom*0.2;
-    if(curstate) {
-        painter.setPen(QPen(Qt::black,zoom*0.1));
-        painter.setBrush(QBrush(Qt::white));
-        for(int i=0; i<n; i++) {
-            for(int j=0; j<n; j++) {
-                color==WHITE ? jx = j+1 : jx = n-j;
-                color==WHITE? ix = n-i : ix = i+1;
-                if(curstate->at(i,j)==WHITE)
-                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)),s,s);
-                if(curstate->at(i,j)==WHITEKING) {
-                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)),s,s);
-                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)),sd,sd);
+    int i = 0, j = 0;
+
+    //белые
+    painter.setPen(QPen(Qt::black,zoom*0.1));
+    painter.setBrush(QBrush(Qt::white));
+    for(i = 0; i < n; i++) {
+        for(j = 0; j < n; j++) {
+            //на нужной клетке
+            if((i + j) % 2 == 0)
+            {
+                if(draughts[i][j] == WHITE)
+                {
+                    jx = j + 1;
+                    ix = n - i;
+                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)), s, s);
+                    qDebug() << "White: " << i << " " << j;
+                }
+                if(draughts[i][j] == WHITE_KING)
+                {
+                    jx = n - j;
+                    ix = i + 1;
+                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)), s, s);
+                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)), sd, sd);
                 }
             }
         }
-        painter.setBrush(QBrush(Qt::black));
-        for(int i=0; i<n; i++) {
-            for(int j=0; j<n; j++) {
-                color==WHITE ? jx = j+1 : jx = n-j;
-                color==WHITE ? ix = n-i : ix = i+1;
-                if(curstate->at(i,j)==BLACK)
-                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)),s,s);
-                if(curstate->at(i,j)==BLACKKING) {
-                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)),s,s);
+    }
+
+    //чёрные
+    painter.setBrush(QBrush(Qt::black));
+    for(i = 0; i < n; i++) {
+        for(j = 0; j < n; j++) {
+            //на нужной клетке
+            if((i + j) % 2 == 0)
+            {
+                if(draughts[i][j] == BLACK)
+                {
+                    jx = j + 1;
+                    ix = n - i;
+                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)), s, s);
+                    qDebug() << "Black: " << i << " " << j;
+                }
+                if(draughts[i][j] == BLACK_KING) {
+                    jx = n - j;
+                    ix = i + 1;
+                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)), s, s);
                     painter.setPen(QPen(Qt::white,zoom*0.1));
-                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)),sd,sd);
+                    painter.drawEllipse(QPoint(zoom*(ix),zoom*(jx)), sd, sd);
                     painter.setPen(QPen(Qt::black,zoom*0.1));
                 }
             }
         }
     }
-    */
 }
 
 void CheckersPicture::resizeEvent (QResizeEvent * event) {

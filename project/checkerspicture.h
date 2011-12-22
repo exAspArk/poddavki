@@ -9,12 +9,20 @@
 
 typedef unsigned int uint8;
 
+//перечисление - взято из делфи-проекта(суть в принципе ясна)
+enum CheckerState{NONE, WHITE,
+                  WHITE_KING,
+                  BLACK, BLACK_KING};
+
+
 class CheckersPicture : public QWidget
 {
     Q_OBJECT
 public:
     CheckersPicture(QWidget * parent = 0);
     ~CheckersPicture();
+    void setDraughts(CheckerState ** _draughts);
+
 public slots:
 signals:
     void mouseClicked(int, int);
@@ -32,8 +40,8 @@ private:
     int side;
     int zoom;
     int n;      //количество клеток
-
-    uint8 color;										// цвет шашек противника
+    uint8 color;	//цвет шашек противника
+    CheckerState ** draughts;//массив с шашками
 };
 
 #endif // CHECKERSPICTURE_H
