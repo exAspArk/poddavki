@@ -42,6 +42,8 @@ private:
     int n;      //количество клеток
     uint8 color;	//цвет шашек противника
     CheckerState ** draughts;//массив с шашками
+    int selectedCelli, selectedCellj;   //позици€ выделенной €чейки
+    int mouseClickCount;    //количество нажатий
 };
 
 #endif // CHECKERSPICTURE_H

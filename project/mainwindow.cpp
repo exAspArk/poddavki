@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	resize(800,600);
 
     actionEndGame->setEnabled(false);
+    startNewGame();
 }
 
 MainWindow::~MainWindow()
@@ -44,13 +45,13 @@ void MainWindow::startNewGame() {
             draughts[i][j] = NONE;
 
     //записываем данные о пешках в начальном состоянии
-    for(i = 0; i < 8; i++)
+    for(j = 0; j < 8; j++)
     {
-        for(j = 0; j < 3; j++)
-            if((i + j) % 2 == 0)
+        for(i = 0; i < 3; i++)
+            if((i + j) % 2 == 1)
                 draughts[i][j] = BLACK;
-        for(j = 5; j < 8; j++)
-            if((i + j) % 2 == 0)
+        for(i = 5; i < 8; i++)
+            if((i + j) % 2 == 1)
                 draughts[i][j] = WHITE;
     }
 
@@ -71,7 +72,6 @@ void MainWindow::endGame() {
         for(int j = 0; j < 8; j++)
             draughts[i][j] = NONE;
 
-    //обновляем поле
     this->picture->update();
 }
 
