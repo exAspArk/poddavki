@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+#define PROLOG_PROGRAM "C:/Sii/project/maryapples.pro"
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	setupUi(this);
@@ -27,6 +29,29 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     actionEndGame->setEnabled(false);
     startNewGame();
+
+    //инклуд файла
+    putenv("SWI_HOME_DIR=C:\\Program Files (x86)\\pl");
+    static char * av []  =  { PROLOG_PROGRAM } ;
+    if (!PL_initialise(1 , av))
+    {
+        PL_halt(1) ;
+    }
+
+    try
+    {
+        PlTermv terms(10);
+        PlQuery q ("love" , terms) ;
+
+        if (q.next_solution())
+            qDebug() << QString(terms[2]);
+        else
+            qDebug() << "no solution";
+    }
+    catch ( PlException & ex )
+    {
+        QMessageBox::warning ( this , "Prolog Exception" , QString ( "Prolog has thrown an exception:" ) + QString ( ( char * ) ex ) ) ;
+    }
 }
 
 MainWindow::~MainWindow()

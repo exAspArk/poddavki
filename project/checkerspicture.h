@@ -7,6 +7,9 @@
 #include <QResizeEvent>
 #include <QPaintEvent>
 
+#include "swi-prolog.h"
+#include "swi-cpp.h"
+
 typedef unsigned int uint8;
 
 //перечисление - взято из делфи-проекта(суть в принципе ясна)

@@ -145,14 +145,14 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
             //на нужной клетке
             if((i + j) % 2 == 1)
             {
-                if(draughts[j][i] == WHITE)
+                if(draughts[i][j] == WHITE)
                 {
-                    painter.drawEllipse(QPoint(zoom * (i + 1), zoom * (j + 1)), s, s);
+                    painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), s, s);
                 }
-                if(draughts[j][i] == WHITE_KING)
+                if(draughts[i][j] == WHITE_KING)
                 {
-                    painter.drawEllipse(QPoint(zoom * (i + 1), zoom * (j + 1)), s, s);
-                    painter.drawEllipse(QPoint(zoom * (i + 1), zoom * (j + 1)), sd, sd);
+                    painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), s, s);
+                    painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), sd, sd);
                 }
             }
         }
@@ -165,14 +165,14 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
             //на нужной клетке
             if((i + j) % 2 == 1)
             {
-                if(draughts[j][i] == BLACK)
+                if(draughts[i][j] == BLACK)
                 {
-                    painter.drawEllipse(QPoint(zoom * (i + 1), zoom * (j + 1)), s, s);
+                    painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), s, s);
                 }
-                if(draughts[j][i] == BLACK_KING) {
-                    painter.drawEllipse(QPoint(zoom * (i + 1), zoom * (j + 1)), s, s);
+                if(draughts[i][j] == BLACK_KING) {
+                    painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), s, s);
                     painter.setPen(QPen(Qt::white,zoom*0.1));
-                    painter.drawEllipse(QPoint(zoom * (i + 1), zoom * (j + 1)), sd, sd);
+                    painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), sd, sd);
                     painter.setPen(QPen(Qt::black,zoom*0.1));
                 }
             }

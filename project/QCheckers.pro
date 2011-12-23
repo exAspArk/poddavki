@@ -12,3 +12,5 @@ FORMS += mainwindow.ui
 RESOURCES += icons.qrc
 OTHER_FILES += README \
     COPYING
+LIBS += ./swi-prolog/bin/swipl.dll
+INCLUDEPATH += ./swi-prolog/include
