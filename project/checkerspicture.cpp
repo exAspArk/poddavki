@@ -16,6 +16,7 @@ CheckersPicture::CheckersPicture(QWidget *parent) : QWidget(parent)
     selectedCelli = -1;
     selectedCellj = -1;
     mouseClickCount = 0;
+    gameStarted = false;
     setMinimumSize(zoom*(n+1),zoom*(n+1));
 }
 
@@ -31,6 +32,9 @@ void CheckersPicture::setDraughts(CheckerState ** _draughts)
 
 void CheckersPicture::mousePressEvent(QMouseEvent *event)
 {
+    if(this->gameStarted == false)
+        return;
+
     if (event->buttons() && Qt::LeftButton)
     {
         qreal i_d = (event->pos().x() - p.x() + side/(2*n+2))*(n+1)/side - 1.0;
@@ -80,11 +84,11 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
 
             this->update();
         }
-/*
+        /*
         if(color==BLACK)
             emit mouseClicked((int)i,(int)j);
         else
-            emit mouseClicked(n -1 - (int)i, n - 1 - (int)j);*/
+            emit mouseClicked(n - 1 - (int)i, n - 1 - (int)j);*/
     }
 }
 

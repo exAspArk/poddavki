@@ -21,6 +21,7 @@ private slots:
     void about();
 	void gameEnded(uint8 status);
 private:
+    bool retractall(const char * what);
     CheckerState ** draughts;     //массив с расположением фигур
 };
 
