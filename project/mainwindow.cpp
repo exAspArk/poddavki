@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 
-#define PROLOG_PROGRAM "C:/Sii/project/maryapples.pro"
-
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 	setupUi(this);
@@ -29,29 +27,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     actionEndGame->setEnabled(false);
     startNewGame();
-
-    //инклуд файла
-    putenv("SWI_HOME_DIR=C:\\Program Files (x86)\\pl");
-    static char * av []  =  { PROLOG_PROGRAM } ;
-    if (!PL_initialise(1 , av))
-    {
-        PL_halt(1) ;
-    }
-
-    try
-    {
-        PlTermv terms(10);
-        PlQuery q ("love" , terms) ;
-
-        if (q.next_solution())
-            qDebug() << QString(terms[2]);
-        else
-            qDebug() << "no solution";
-    }
-    catch ( PlException & ex )
-    {
-        QMessageBox::warning ( this , "Prolog Exception" , QString ( "Prolog has thrown an exception:" ) + QString ( ( char * ) ex ) ) ;
-    }
 }
 
 MainWindow::~MainWindow()
@@ -69,6 +44,8 @@ void MainWindow::startNewGame() {
         for(j = 0; j < 8; j++)
             draughts[i][j] = NONE;
 
+
+
     //записываем данные о пешках в начальном состоянии
     for(j = 0; j < 8; j++)
     {
@@ -79,8 +56,64 @@ void MainWindow::startNewGame() {
             if((i + j) % 2 == 1)
                 draughts[i][j] = WHITE;
     }
+    //обнуляем значения в прологе
+/*
+    //инклуд файла
+    putenv("SWI_HOME_DIR=C:\\Program Files (x86)\\pl");
+    static char * av []  =  {"libpl.dll", NULL} ;
+
+    if (PL_initialise(1 , av) == 0)
+    {
+        PL_halt(1);
+        qDebug() << "lib initialize error -(";
+    }
+    else
+        qDebug() << "lib initialize ok!";
+
+    //открытие файла пролога
+    try
+    {
+        PlQuery q("call", PlTermv(PlCompound("consult('poddavki.pl')")));
+        if(q.next_solution())
+            qDebug() << "database opening ok!";
+        else
+            qDebug() << "database opening fail!";
+
+
+        PlTermv pt(2);
+        PlQuery retrall("retractall", PlTermv(PlCompound("computer_figure")));
+
+        char str_i[3];
+        char str_j[3];
+        for(int i = 0; i < 8; i++)
+            for(j = 0; j < 8; j++)
+            {
+                _itoa(i, str_i, 10);
+                _itoa(j, str_j, 10);
+                switch(draughts[i][j])
+                {
+                    case BLACK:
+
+                    pt[0] = PlCompound("computer_figure", PlTermv(PlTerm(str_i), PlTerm(str_j)));
+                    PlQuery q1("assert", pt);
+                    qDebug() << i << j;
+                    if(q1.next_solution())
+                        qDebug() << "assert ok";
+                    else
+                        qDebug() << "assert fail";
+                }
+            }
+        PlQuery q2("computer_figure", pt);
+       // while(q2.next_solution())
+         //   qDebug() << (char *)pt[0];
+    }
+    catch ( PlException & ex )
+    {
+        QMessageBox::warning ( this , "Prolog Exception" , QString ( "Prolog has thrown an exception:" ) + QString ( ( char * ) ex ) ) ;
+    }*/
 
     //обновляем поле
+    this->picture->gameStarted = true;
     this->picture->update();
 
     //включаем кнопку выключения игры
@@ -97,6 +130,7 @@ void MainWindow::endGame() {
         for(int j = 0; j < 8; j++)
             draughts[i][j] = NONE;
 
+    this->picture->gameStarted = false;
     this->picture->update();
 }
 
@@ -118,4 +152,10 @@ void MainWindow::about() {
 "<P align=center>- ВолгГТУ, ИВТ-460, 2011 -"));
 }
 
-
+bool MainWindow::retractall(const char * what)
+{
+    PlQuery q("retractall", PlTermv(PlCompound(what)));
+    if(q.next_solution())
+        return true;
+    else return false;
+}

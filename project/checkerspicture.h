@@ -25,6 +25,7 @@ public:
     CheckersPicture(QWidget * parent = 0);
     ~CheckersPicture();
     void setDraughts(CheckerState ** _draughts);
+    bool gameStarted;
 
 public slots:
 signals:
