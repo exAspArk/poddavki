@@ -29,7 +29,8 @@ public:
 
 public slots:
 signals:
-    void mouseClicked(int, int);
+    void playerMove(int, int, int, int);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

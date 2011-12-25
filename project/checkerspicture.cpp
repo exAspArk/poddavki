@@ -47,10 +47,10 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
         if(selectedCelli == i && selectedCellj == j)
             return;
 
-        //если нажато не на белую клетку и по белому элементу
+        //если нажато не на белую клетку
         if((i + j) % 2 == 1)
         {
-
+            //и по белой пешке, дамке
             if(mouseClickCount == 0 && (draughts[i][j] == WHITE || draughts[i][j] == WHITE_KING))
             {
                 selectedCelli = i;
@@ -59,19 +59,19 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
                 qDebug() << "first";
                 this->update();
             }
-            else if(mouseClickCount == 1 && draughts[i][j] == NONE)
+            else if(mouseClickCount == 1 && draughts[i][j] == NONE)//на пустой клетке
             {
                 //сигнал о перемещении c selectedcelli, selectedcellj на i, j
-                enum CheckerState state = this->draughts[selectedCelli][selectedCellj];
-                this->draughts[selectedCelli][selectedCellj] = NONE;
-                this->draughts[i][j] = state;
+                //enum CheckerState state = this->draughts[selectedCelli][selectedCellj];
+                //this->draughts[selectedCelli][selectedCellj] = NONE;
+                //this->draughts[i][j] = state;
 
+                qDebug() << "second";
+                qDebug() << "emit" << selectedCelli << selectedCellj << i << j;
+                emit playerMove(selectedCelli, selectedCellj, i, j);
                 selectedCelli = -1;
                 selectedCellj = -1;
                 mouseClickCount = 0;
-                qDebug() << "second";
-
-                this->update();
             }
         }
         else
