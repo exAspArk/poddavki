@@ -180,26 +180,99 @@ void MainWindow::move(int from_i, int from_j, int to_i, int to_j)
     _itoa(to_i, str_to_i, 10);
     _itoa(to_j, str_to_j, 10);
 
-    if(PlCall("player_can_move", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j), PlCompound(str_to_i), PlCompound(str_to_j))))
+    try
     {
-        //можно ходить - ок
-        //ходит компьютер
-        PlCall("computer_move");
-/*
-        //сбрасывем новые данные в массив draughts
-        for(int i = 0; i < 8; i++)
+        if(PlCall("player_move", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j), PlCompound(str_to_i), PlCompound(str_to_j))))
         {
-            for(int j = 0; j < 8; j++)
+
+
+            qDebug() << "can move" << from_i << from_j << to_i << to_j;
+
+
+
+
+
+
+
+
+            //сбрасывем новые данные в массив draughts
+            for(int i = 0; i < 8; i++)
             {
-                if((i + j) % 2 == 1)    //опять микрооптимизация
+                for(int j = 0; j < 8; j++)
                 {
-                    //запросы
-                    if(PlCall("player_figure", Pl))
+                    if((i + j) % 2 == 1)    //опять микрооптимизация
+                    {
+                        _itoa(i, str_from_i, 10);
+                        _itoa(j, str_from_j, 10);
+                        //qDebug() << "cell:" << i << j;
+                        //запросы
+                        if(PlCall("player_figure", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = WHITE;
+                        else if(PlCall("computer_figure", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = BLACK;
+                        else if(PlCall("player_king", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = WHITE_KING;
+                        else if(PlCall("computer_king", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = BLACK_KING;
+                        else if(PlCall("empty", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = NONE;
+                    }
                 }
             }
-        }*/
+
+            for(int i = 0; i < 8; i++)
+                    qDebug() << draughts[i][0] << draughts[i][1] << draughts[i][2] << draughts[i][3] << draughts[i][4] << draughts[i][5] << draughts[i][6] << draughts[i][7];
+
+
+
+
+
+
+
+
+
+
+
+
+            //можно ходить - ок
+            //ходит компьютер
+            PlCall("computer_move");
+
+            //сбрасывем новые данные в массив draughts
+            for(int i = 0; i < 8; i++)
+            {
+                for(int j = 0; j < 8; j++)
+                {
+                    if((i + j) % 2 == 1)    //опять микрооптимизация
+                    {
+                        _itoa(i, str_from_i, 10);
+                        _itoa(j, str_from_j, 10);
+                        //qDebug() << "cell:" << i << j;
+                        //запросы
+                        if(PlCall("player_figure", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = WHITE;
+                        else if(PlCall("computer_figure", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = BLACK;
+                        else if(PlCall("player_king", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = WHITE_KING;
+                        else if(PlCall("computer_king", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = BLACK_KING;
+                        else if(PlCall("empty", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                            draughts[i][j] = NONE;
+                    }
+                }
+            }
+
+            for(int i = 0; i < 8; i++)
+                    qDebug() << draughts[i][0] << draughts[i][1] << draughts[i][2] << draughts[i][3] << draughts[i][4] << draughts[i][5] << draughts[i][6] << draughts[i][7];
+        }
+        else
+            qDebug() << "cannot move" << from_i << from_j << to_i << to_j;
+
     }
-    else
-        qDebug() << "cannot move" << from_i << from_j << to_i << to_j;
+    catch ( PlException & ex )
+    {
+        QMessageBox::warning ( this , "Prolog Exception" , QString ( "Prolog has thrown an exception:" ) + QString ( ( char * ) ex ) ) ;
+    }
     this->picture->update();
 }
