@@ -20,8 +20,8 @@ private slots:
 	void endGame();
     void about();
 	void gameEnded(uint8 status);
+    void move(int from_i, int from_j, int to_i, int to_j);
 private:
-    bool retractall(const char * what);
     CheckerState ** draughts;     //массив с расположением фигур
 };
 
