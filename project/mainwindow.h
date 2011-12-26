@@ -4,6 +4,7 @@
 #include <QtGui/QMainWindow>
 #include <QMessageBox>
 #include <QTextCodec>
+#include <QTimer>
 #include "checkerspicture.h"
 
 #include "ui_mainwindow.h"
@@ -19,10 +20,11 @@ private slots:
 	void startNewGame();
 	void endGame();
     void about();
-	void gameEnded(uint8 status);
-    void move(int from_i, int from_j, int to_i, int to_j);
+    void player_move(int from_i, int from_j, int to_i, int to_j);
+    void computer_move();
 private:
-    CheckerState ** draughts;     //массив с расположением фигур
+    bool isGameEnded();
+    CheckerState ** draughts;   //массив с расположением фигур
 };
 
 #endif // MAINWINDOW_H

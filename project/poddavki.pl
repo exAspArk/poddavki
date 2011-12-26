@@ -20,22 +20,14 @@
 	computer_king/2.	
 :- dynamic 
 	player_king/2.
+:- dynamic
+	is_member/2.
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 
 
-computer_figure(0,1).
-computer_figure(0,3). 
-computer_figure(0,5). 
-computer_figure(0,7). 
-computer_figure(1,0). 
-computer_figure(1,2). 
-computer_figure(1,4). 
-computer_figure(1,6). 
-computer_figure(2,1). 
-computer_figure(2,3). 
-computer_figure(2,5). 
-computer_figure(2,7). 
+computer_figure(0,5).
+player_figure(1,0).
 player_figure(5,0). 
 player_figure(5,2). 
 player_figure(5,4). 
@@ -83,7 +75,8 @@ is_member(X,[Element|List]):-
 player_try_to_get_king(0, Y2):-
 	player_figure(0, Y2),
 	not(player_king(0, Y2)),                    % если не дамка игрока
-	assert(player_king(0, Y2)).              % добавляем ее в начало БД
+	retract(player_figure(0, Y2)),		%удаляем пешку
+	assert(player_king(0, Y2)).              % добавляем дамку
 	
 player_try_to_get_king(_, _).
 
