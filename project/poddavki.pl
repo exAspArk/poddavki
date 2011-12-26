@@ -72,6 +72,11 @@ next_cell(X1, Y1, Dx, Dy, X2, Y2):-
 	empty(X, Y),
 	next_cell(X, Y, Dx, Dy, X2, Y2).
 
+% проверка, есть ли элемент X в большом списке []
+is_member(X,[X,List]).
+is_member(X,[Element|List]):-
+	is_member(X,List).	
+	
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! PLAYER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 
 % сохраняем дамку в БД, если игрок дошел до верху шашкой
@@ -258,12 +263,12 @@ player_try_move(X1, Y1):-
 	!.
 player_try_move(X1, Y1):-
 	player_king(X1, Y1),
-	player_king_need_kill(X1, Y1, X2, Y2, Px1, Py1).
-	
-%player_try_move(X1, Y1):-
-%	player_figure(X1, Y1),
-%	player_can_move(X1, Y1, X2, Y2),
-%	empty(X2, Y2).	
+	player_king_need_kill(X1, Y1, X2, Y2, Px1, Py1),
+	!.
+player_try_move(X1, Y1):-
+	player_figure(X1, Y1),
+	player_can_move(X1, Y1, X2, Y2),
+	empty(X2, Y2).	
 	
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! AI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 	
@@ -383,12 +388,12 @@ computer_try_move(X1, Y1):-
 	!.
 computer_try_move(X1, Y1):-
 	computer_king(X1, Y1),
-	computer_king_need_kill(X1, Y1, X2, Y2, Px1, Py1).
-
-%computer_try_move(X1, Y1):-
-%	computer_figure(X1, Y1),
-%	computer_can_move(X1, Y1, X2, Y2),
-%	empty(X2, Y2).
+	computer_king_need_kill(X1, Y1, X2, Y2, Px1, Py1),
+	!.
+computer_try_move(X1, Y1):-
+	computer_figure(X1, Y1),
+	computer_can_move(X1, Y1, X2, Y2),
+	empty(X2, Y2).
 	
 % шашка убивает
 computer_move:-
