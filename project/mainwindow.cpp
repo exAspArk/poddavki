@@ -12,16 +12,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     for(int i = 0; i < 8; i++)
         draughts[i] = new CheckerState[8];
 
-    //передаём шашки в отрисовку
-    this->picture->setDraughts(this->draughts);
+    //передаём массив с шашками в отрисовку
+    this->picture->setDraughts(draughts);
 
 	// Signal-Slots
-    connect(actionExit, SIGNAL(triggered()), this, SLOT(close()));
-
-	connect(actionStartNewGame, SIGNAL(triggered()), this, SLOT(startNewGame()));
-	connect(actionEndGame, SIGNAL(triggered()), this, SLOT(endGame()));
-    connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-    connect(this->picture, SIGNAL(playerMove(int,int,int,int)), this, SLOT(move(int, int, int, int)));
+    connect(this->actionExit,           SIGNAL(triggered()), this, SLOT(close()));
+    connect(this->actionStartNewGame,   SIGNAL(triggered()), this, SLOT(startNewGame()));
+    connect(this->actionEndGame,        SIGNAL(triggered()), this, SLOT(endGame()));
+    connect(this->actionAbout,          SIGNAL(triggered()), this, SLOT(about()));
+    connect(this->picture,              SIGNAL(playerMove(int,int,int,int)), this, SLOT(player_move(int, int, int, int)));
 
     setWindowTitle(tr("Поддавки"));
 	resize(800,600);
@@ -51,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         QMessageBox::warning ( this , "Prolog Exception" , QString ( "Prolog has thrown an exception:" ) + QString ( ( char * ) ex ) ) ;
     }
 
-    actionEndGame->setEnabled(false);
+    this->actionEndGame->setEnabled(false);
     startNewGame();
 }
 
@@ -62,7 +61,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::startNewGame() {
     //выключаем кнопку начала новой игры
-    actionStartNewGame->setEnabled(false);
+    this->actionStartNewGame->setEnabled(false);
 
     int i = 0, j = 0;
     //обнуляем значения из базы
@@ -82,6 +81,7 @@ void MainWindow::startNewGame() {
     }
     try
     {
+        /*
         //обнуляем значения в прологе
         PlCall("retractall", PlTermv(PlCompound("computer_figure(_,_)")));
         PlCall("retractall", PlTermv(PlCompound("player_figure(_,_)")));
@@ -121,6 +121,35 @@ void MainWindow::startNewGame() {
                 }
             }
         }
+        */
+        char str_i[5];
+        char str_j[5];
+        //сбрасывем новые данные в массив draughts из файла(временно).
+        for(int i = 0; i < 8; i++)
+        {
+            for(int j = 0; j < 8; j++)
+            {
+                if((i + j) % 2 == 1)    //опять микрооптимизация
+                {
+                    _itoa(i, str_i, 10);
+                    _itoa(j, str_j, 10);
+
+                    PlTermv args = PlTermv(PlCompound(str_i), PlCompound(str_j));
+
+                    //запросы
+                    if(PlCall("player_figure", args))
+                        draughts[i][j] = WHITE;
+                    else if(PlCall("computer_figure", args))
+                        draughts[i][j] = BLACK;
+                    else if(PlCall("player_king", args))
+                        draughts[i][j] = WHITE_KING;
+                    else if(PlCall("computer_king", args))
+                        draughts[i][j] = BLACK_KING;
+                    else if(PlCall("empty", args))
+                        draughts[i][j] = NONE;
+                }
+            }
+        }
     }
 
     catch ( PlException & ex )
@@ -133,13 +162,13 @@ void MainWindow::startNewGame() {
     this->picture->update();
 
     //включаем кнопку выключения игры
-    actionEndGame->setEnabled(true);
+    this->actionEndGame->setEnabled(true);
 }
 
 void MainWindow::endGame() {
     //обратные действия с кнопками
-	actionEndGame->setEnabled(false);
-    actionStartNewGame->setEnabled(true);
+    this->actionEndGame->setEnabled(false);
+    this->actionStartNewGame->setEnabled(true);
 
     //обнуляем значения из базы
     for(int i = 0; i < 8; i++)
@@ -148,15 +177,6 @@ void MainWindow::endGame() {
 
     this->picture->gameStarted = false;
     this->picture->update();
-}
-
-void MainWindow::gameEnded(uint8 status) {
-    if(status == 0)
-        QMessageBox::information(this, tr("Белые победили!"),
-        tr("Чёрные победили!") );
-    if(status == 1)
-        QMessageBox::information(this, tr("Чёрные победили!"),
-        tr("Чёрные победили!") );
 }
 
 void MainWindow::about() {
@@ -168,12 +188,14 @@ void MainWindow::about() {
 "<P align=center>- ВолгГТУ, ИВТ-460, 2011 -"));
 }
 
-void MainWindow::move(int from_i, int from_j, int to_i, int to_j)
+void MainWindow::player_move(int from_i, int from_j, int to_i, int to_j)
 {
     char str_from_i[5];
     char str_from_j[5];
     char str_to_i[5];
     char str_to_j[5];
+    char str_i[5];
+    char str_j[5];
 
     _itoa(from_i, str_from_i, 10);
     _itoa(from_j, str_from_j, 10);
@@ -184,17 +206,8 @@ void MainWindow::move(int from_i, int from_j, int to_i, int to_j)
     {
         if(PlCall("player_move", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j), PlCompound(str_to_i), PlCompound(str_to_j))))
         {
-
-
             qDebug() << "can move" << from_i << from_j << to_i << to_j;
 
-
-
-
-
-
-
-
             //сбрасывем новые данные в массив draughts
             for(int i = 0; i < 8; i++)
             {
@@ -202,19 +215,21 @@ void MainWindow::move(int from_i, int from_j, int to_i, int to_j)
                 {
                     if((i + j) % 2 == 1)    //опять микрооптимизация
                     {
-                        _itoa(i, str_from_i, 10);
-                        _itoa(j, str_from_j, 10);
-                        //qDebug() << "cell:" << i << j;
+                        _itoa(i, str_i, 10);
+                        _itoa(j, str_j, 10);
+
+                        PlTermv args = PlTermv(PlCompound(str_i), PlCompound(str_j));
+
                         //запросы
-                        if(PlCall("player_figure", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                        if(PlCall("player_figure", args))
                             draughts[i][j] = WHITE;
-                        else if(PlCall("computer_figure", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                        else if(PlCall("computer_figure", args))
                             draughts[i][j] = BLACK;
-                        else if(PlCall("player_king", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                        else if(PlCall("player_king", args))
                             draughts[i][j] = WHITE_KING;
-                        else if(PlCall("computer_king", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                        else if(PlCall("computer_king", args))
                             draughts[i][j] = BLACK_KING;
-                        else if(PlCall("empty", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
+                        else if(PlCall("empty", args))
                             draughts[i][j] = NONE;
                     }
                 }
@@ -223,51 +238,20 @@ void MainWindow::move(int from_i, int from_j, int to_i, int to_j)
             for(int i = 0; i < 8; i++)
                     qDebug() << draughts[i][0] << draughts[i][1] << draughts[i][2] << draughts[i][3] << draughts[i][4] << draughts[i][5] << draughts[i][6] << draughts[i][7];
 
+            this->picture->update();
 
-
-
-
-
-
-
-
-
-
-
-            //можно ходить - ок
-            //ходит компьютер
-            PlCall("computer_move");
-
-            //сбрасывем новые данные в массив draughts
-            for(int i = 0; i < 8; i++)
+            //если игра не закончилась, передаём ход
+            if(isGameEnded() == false)
             {
-                for(int j = 0; j < 8; j++)
-                {
-                    if((i + j) % 2 == 1)    //опять микрооптимизация
-                    {
-                        _itoa(i, str_from_i, 10);
-                        _itoa(j, str_from_j, 10);
-                        //qDebug() << "cell:" << i << j;
-                        //запросы
-                        if(PlCall("player_figure", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
-                            draughts[i][j] = WHITE;
-                        else if(PlCall("computer_figure", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
-                            draughts[i][j] = BLACK;
-                        else if(PlCall("player_king", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
-                            draughts[i][j] = WHITE_KING;
-                        else if(PlCall("computer_king", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
-                            draughts[i][j] = BLACK_KING;
-                        else if(PlCall("empty", PlTermv(PlCompound(str_from_i), PlCompound(str_from_j))))
-                            draughts[i][j] = NONE;
-                    }
-                }
+                //запуск таймера для хода компьютера
+                QTimer::singleShot(1000, this, SLOT(computer_move()));
             }
-
-            for(int i = 0; i < 8; i++)
-                    qDebug() << draughts[i][0] << draughts[i][1] << draughts[i][2] << draughts[i][3] << draughts[i][4] << draughts[i][5] << draughts[i][6] << draughts[i][7];
         }
         else
+        {
             qDebug() << "cannot move" << from_i << from_j << to_i << to_j;
+            this->picture->update();
+        }
 
     }
     catch ( PlException & ex )
@@ -275,4 +259,72 @@ void MainWindow::move(int from_i, int from_j, int to_i, int to_j)
         QMessageBox::warning ( this , "Prolog Exception" , QString ( "Prolog has thrown an exception:" ) + QString ( ( char * ) ex ) ) ;
     }
     this->picture->update();
+}
+
+void MainWindow::computer_move()
+{
+    char str_i[5];
+    char str_j[5];
+
+    try
+    {
+        //можно ходить - ок
+        //ходит компьютер
+        PlCall("computer_move");
+
+        //сбрасывем новые данные в массив draughts
+        for(int i = 0; i < 8; i++)
+        {
+            for(int j = 0; j < 8; j++)
+            {
+                if((i + j) % 2 == 1)    //опять микрооптимизация
+                {
+                    _itoa(i, str_i, 10);
+                    _itoa(j, str_j, 10);
+
+                    //запросы
+                    PlTermv args = PlTermv(PlCompound(str_i), PlCompound(str_j));
+
+                    if(PlCall("player_figure", args))
+                        draughts[i][j] = WHITE;
+                    else if(PlCall("computer_figure", args))
+                        draughts[i][j] = BLACK;
+                    else if(PlCall("player_king", args))
+                        draughts[i][j] = WHITE_KING;
+                    else if(PlCall("computer_king", args))
+                        draughts[i][j] = BLACK_KING;
+                    else if(PlCall("empty", args))
+                        draughts[i][j] = NONE;
+                }
+            }
+        }
+
+        for(int i = 0; i < 8; i++)
+                qDebug() << draughts[i][0] << draughts[i][1] << draughts[i][2] << draughts[i][3] << draughts[i][4] << draughts[i][5] << draughts[i][6] << draughts[i][7];
+
+        this->picture->update();
+
+        //проверяем, закончилась ли игра
+        isGameEnded();
+    }
+    catch ( PlException & ex )
+    {
+        QMessageBox::warning ( this , "Prolog Exception" , QString ( "Prolog has thrown an exception:" ) + QString ( ( char * ) ex ) ) ;
+    }
+}
+
+bool MainWindow::isGameEnded()
+{
+    if(PlCall("computer_win"))
+    {
+        QMessageBox::information(this, tr("Чёрные победили!"), tr("Чёрные победили!") );
+        return true;
+    }
+    else if(PlCall("player_win"))
+    {
+        QMessageBox::information(this, tr("Белые победили!"), tr("Белые победили!") );
+        return true;
+    }
+    else
+        return false;
 }
