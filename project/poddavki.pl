@@ -25,21 +25,13 @@
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 
+computer_figure(1,6).
+computer_figure(2,5).
+computer_figure(3,2). 
+computer_figure(3,4).
 
-computer_figure(0,5).
-player_figure(1,0).
-player_figure(5,0). 
+player_figure(5,0).
 player_figure(5,2). 
-player_figure(5,4). 
-player_figure(5,6).
-player_figure(6,1).
-player_figure(6,3). 
-player_figure(6,5). 
-player_figure(6,7). 
-player_figure(7,0). 
-player_figure(7,2). 
-player_figure(7,4). 
-player_figure(7,6). 
 
 % координаты на доске
 onboard(X, Y):-
