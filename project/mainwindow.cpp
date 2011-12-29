@@ -64,6 +64,7 @@ void MainWindow::startNewGame() {
     this->actionStartNewGame->setEnabled(false);
 
     int i = 0, j = 0;
+    /*
     //обнуляем значения из базы
     for(i = 0; i < 8; i++)
         for(j = 0; j < 8; j++)
@@ -78,13 +79,13 @@ void MainWindow::startNewGame() {
         for(i = 5; i < 8; i++)
             if((i + j) % 2 == 1)
                 draughts[i][j] = WHITE;
-    }
+    }*/
     try
     {
         /*
         //обнуляем значения в прологе
-        PlCall("retractall", PlTermv(PlCompound("computer_figure(_,_)")));
-        PlCall("retractall", PlTermv(PlCompound("player_figure(_,_)")));
+        PlCall("retractall", PlTermv(PlCompound("computer_checker(_,_)")));
+        PlCall("retractall", PlTermv(PlCompound("player_checker(_,_)")));
         PlCall("retractall", PlTermv(PlCompound("computer_king(_,_)")));
         PlCall("retractall", PlTermv(PlCompound("player_king(_,_)")));
 
@@ -105,9 +106,9 @@ void MainWindow::startNewGame() {
 
                     //запросы
                     if(draughts[i][j] == WHITE)
-                       strcpy(assert, "player_figure");
+                       strcpy(assert, "player_checker");
                     else if(draughts[i][j] == BLACK)
-                         strcpy(assert, "computer_figure");
+                         strcpy(assert, "computer_checker");
                     else
                         continue;
 
@@ -137,9 +138,9 @@ void MainWindow::startNewGame() {
                     PlTermv args = PlTermv(PlCompound(str_i), PlCompound(str_j));
 
                     //запросы
-                    if(PlCall("player_figure", args))
+                    if(PlCall("player_checker", args))
                         draughts[i][j] = WHITE;
-                    else if(PlCall("computer_figure", args))
+                    else if(PlCall("computer_checker", args))
                         draughts[i][j] = BLACK;
                     else if(PlCall("player_king", args))
                         draughts[i][j] = WHITE_KING;
@@ -221,9 +222,9 @@ void MainWindow::player_move(int from_i, int from_j, int to_i, int to_j)
                         PlTermv args = PlTermv(PlCompound(str_i), PlCompound(str_j));
 
                         //запросы
-                        if(PlCall("player_figure", args))
+                        if(PlCall("player_checker", args))
                             draughts[i][j] = WHITE;
-                        else if(PlCall("computer_figure", args))
+                        else if(PlCall("computer_checker", args))
                             draughts[i][j] = BLACK;
                         else if(PlCall("player_king", args))
                             draughts[i][j] = WHITE_KING;
@@ -285,9 +286,9 @@ void MainWindow::computer_move()
                     //запросы
                     PlTermv args = PlTermv(PlCompound(str_i), PlCompound(str_j));
 
-                    if(PlCall("player_figure", args))
+                    if(PlCall("player_checker", args))
                         draughts[i][j] = WHITE;
-                    else if(PlCall("computer_figure", args))
+                    else if(PlCall("computer_checker", args))
                         draughts[i][j] = BLACK;
                     else if(PlCall("player_king", args))
                         draughts[i][j] = WHITE_KING;
