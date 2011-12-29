@@ -1,47 +1,58 @@
-%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
-%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Copyright © 2011 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
-%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Copyright Â© 2011 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
   
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! GLOSSARY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
-% checkers            - øàøêè (àìåð.)
-% suicide checkers - ïîääàâêà (also anti-checkers, giveaway checkers)
-% checker             - øàøêà
-% king                  - äàìêà
-% computer           - êîìïüþòåð
-% player               - èãðîê
-% figure                - ôèãóðà â øàøêàõ(äàìêà/øàøêà)
+% checkers              - ÑˆÐ°ÑˆÐºÐ¸ (Ð°Ð¼ÐµÑ€.)
+% suicide checkers      - Ð¿Ð¾Ð´Ð´Ð°Ð²ÐºÐ° (also anti-checkers, giveaway checkers)
+% computer              - ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€
+% player                - Ð¸Ð³Ñ€Ð¾Ðº
+% checker               - ÑˆÐ°ÑˆÐºÐ°
+% king                  - Ð´Ð°Ð¼ÐºÐ°
 
-%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START POSITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 :- dynamic 
-	computer_figure/2.
+	computer_checker/2.
 :- dynamic 
-	player_figure/2.
+	player_checker/2.
 :- dynamic 
 	computer_king/2.	
 :- dynamic 
 	player_king/2.
 :- dynamic
 	is_member/2.
+	
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START POSITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+computer_checker(0,5).
+player_checker(1,0).
+player_checker(5,0). 
+player_checker(5,2). 
+player_checker(5,4). 
+player_checker(5,6).
+player_checker(6,1).
+player_checker(6,3). 
+player_checker(6,5). 
+player_checker(6,7). 
+player_checker(7,0). 
+player_checker(7,2). 
+player_checker(7,4). 
+player_checker(7,6). 
 
-%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
-
-computer_figure(3,0).
-player_figure(4,1). 
-player_figure(6,3). 
-player_figure(2,7). 
-
-% êîîðäèíàòû íà äîñêå
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+% ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ñ‹ Ð½Ð° Ð´Ð¾ÑÐºÐµ
 onboard(X, Y):-
    X > -1, X < 8, Y > -1, Y < 8.
 
-% êëåòêà ïóñòà
+% ÐºÐ»ÐµÑ‚ÐºÐ° Ð¿ÑƒÑÑ‚Ð°
 empty(X, Y):-
 	onboard(X, Y),
-	not(computer_figure(X, Y)),
-	not(player_figure(X, Y)),
+	not(computer_checker(X, Y)),
+	not(player_checker(X, Y)),
+	not(computer_king(X, Y)),
+	not(player_king(X, Y)),
 	!.
 
-% åñëè ìîæíî ïåðåéòè íà êëåòêó (X2, Y2) èç (X1, Y1), ñìåñòèâøèñü íà 1 êëåòêó â íàïðàâëåíèè (Dx, Dy)
+% ÐµÑÐ»Ð¸ Ð¼Ð¾Ð¶Ð½Ð¾ Ð¿ÐµÑ€ÐµÐ¹Ñ‚Ð¸ Ð½Ð° ÐºÐ»ÐµÑ‚ÐºÑƒ (X2, Y2) Ð¸Ð· (X1, Y1), ÑÐ¼ÐµÑÑ‚Ð¸Ð²ÑˆÐ¸ÑÑŒ Ð½Ð° 1 ÐºÐ»ÐµÑ‚ÐºÑƒ Ð² Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ð¸ (Dx, Dy)
 next_cell(X1, Y1, Dx, Dy, X2, Y2):-
 	X2 is X1 + Dx,
 	Y2 is Y1 + Dx,
@@ -53,90 +64,65 @@ next_cell(X1, Y1, Dx, Dy, X2, Y2):-
 	empty(X, Y),
 	next_cell(X, Y, Dx, Dy, X2, Y2).
 
-% ïðîâåðêà, åñòü ëè ýëåìåíò X â áîëüøîì ñïèñêå []
+% Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ°, ÐµÑÑ‚ÑŒ Ð»Ð¸ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚ X Ð² Ð±Ð¾Ð»ÑŒÑˆÐ¾Ð¼ ÑÐ¿Ð¸ÑÐºÐµ []
 is_member(X,[X,List]).
 is_member(X,[Element|List]):-
 	is_member(X,List).	
 	
-%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! PLAYER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
-
-% ñîõðàíÿåì äàìêó â ÁÄ, åñëè èãðîê äîøåë äî âåðõó øàøêîé
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! PLAYER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+% ÑÐ¾Ñ…Ñ€Ð°Ð½ÑÐµÐ¼ Ð´Ð°Ð¼ÐºÑƒ Ð² Ð‘Ð”, ÐµÑÐ»Ð¸ Ð¸Ð³Ñ€Ð¾Ðº Ð´Ð¾ÑˆÐµÐ» Ð´Ð¾ Ð²ÐµÑ€Ñ…Ñƒ ÑˆÐ°ÑˆÐºÐ¾Ð¹
 player_try_to_get_king(0, Y2):-
-	player_figure(0, Y2),
-	not(player_king(0, Y2)),                    % åñëè íå äàìêà èãðîêà
-	retract(player_figure(0, Y2)),		%óäàëÿåì ïåøêó
-	assert(player_king(0, Y2)).              % äîáàâëÿåì äàìêó
+	player_checker(0, Y2),
+	retract(player_checker(0, Y2)),		    % ÑƒÐ´Ð°Ð»ÑÐµÐ¼ ÑˆÐ°ÑˆÐºÑƒ
+	assert(player_king(0, Y2)).             % Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð´Ð°Ð¼ÐºÑƒ
 	
 player_try_to_get_king(_, _).
 
-% õîä øàøêè èãðîêà
-player_checker_current(X1, Y1, X2, Y2):-
-	Dx is X2 - X1,          % +1, åñëè ðàçíîñòü ïîëîæèòåëüíà
-	Dy is Y2 - Y1,          % -1, åñëè ðàçíîñòü îòðèöàòåëüíà
-	X is X1 + Dx,                                 % X = ++X1 (èëè --X1)
-	Y is Y1 + Dy,                                  % Y = ++Y1 (èëè --Y1)
-	player_checker_current(X, Y, X2, Y2, 1).
-														 
-player_checker_current(X1, Y1, X2, Y2, 1):-
-	not(X1 == X2),
-	(computer_figure(X1, Y1) ; player_figure(X1, Y1)),
-	!.
-	
-player_checker_current(X1, Y1, X2, Y2, 1):-
-	not(X1 == X2),
-	Dx is X2 - X1,          % +1, åñëè ðàçíîñòü ïîëîæèòåëüíà
-	Dy is Y2 - Y1,          % -1, åñëè ðàçíîñòü îòðèöàòåëüíà
-	X is X1 + Dx,                                 % X is ++X1 (èëè --X1)
-	Y is Y1 + Dy,                                  % Y is ++Y1 (èëè --Y1)
-	player_checker_current(X, Y, X2, Y2, 1).                 
-
-% ïðîâåðêà íà òî, ÷òî øàøêà èãðîêà äîëæíà åñòü ôèãóðó èç (X1, Y1) ôèãóðó (Gx, Gy) ïåðåéäÿ â (X2, Y2)
+% Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° Ñ‚Ð¾, Ñ‡Ñ‚Ð¾ ÑˆÐ°ÑˆÐºÐ° Ð¸Ð³Ñ€Ð¾ÐºÐ° Ð´Ð¾Ð»Ð¶Ð½Ð° ÐµÑÑ‚ÑŒ Ñ„Ð¸Ð³ÑƒÑ€Ñƒ Ð¸Ð· (X1, Y1) Ñ„Ð¸Ð³ÑƒÑ€Ñƒ (Gx, Gy) Ð¿ÐµÑ€ÐµÐ¹Ð´Ñ Ð² (X2, Y2)
 player_checker_need_kill(X1, Y1, X2, Y2, Gx, Gy):-
-	computer_figure(Gx, Gy),		%Ôèãóðà èãðîêà íà Gx, Gy
-	Dx is Gx - X1,					       %Ñ÷èòàåì ñìåùåíèå
+	computer_checker(Gx, Gy),		% ÑˆÐ°ÑˆÐºÐ° Ð¸Ð³Ñ€Ð¾ÐºÐ° Ð½Ð° Gx, Gy
+	Dx is Gx - X1,					% ÑÑ‡Ð¸Ñ‚Ð°ÐµÐ¼ ÑÐ¼ÐµÑ‰ÐµÐ½Ð¸Ðµ
 	Dy is Gy - Y1,
 	T1 is abs(Dx), 
-	T1 == 1,							%Ïðîâåðÿåì, ÷òî ðàññòîÿíèå ïî õ...
+	T1 = 1,						    % Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼, Ñ‡Ñ‚Ð¾ Ñ€Ð°ÑÑÑ‚Ð¾ÑÐ½Ð¸Ðµ Ð¿Ð¾ Ñ…...
 	T2 is abs(Dy), 
-	T2 == 1,							%è y == 1
-	X2 is Gx + Dx,					%Îïðåäåëÿåì ïîçèöèþ, 
-	Y2 is Gy + Dy,					%â êîòîðóþ äîëæíà ïîïàñòü øàøêà ïîñëå ñúåäàíèÿ
-	empty(X2, Y2).					 %Óäîñòîâåðÿåìñÿ, ÷òî òàì ïóñòî
+	T2 = 1,						    % Ð¸ y == 1
+	X2 is Gx + Dx,					% Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÐ¼ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÑŽ, 
+	Y2 is Gy + Dy,					% Ð² ÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð´Ð¾Ð»Ð¶Ð½Ð° Ð¿Ð¾Ð¿Ð°ÑÑ‚ÑŒ ÑˆÐ°ÑˆÐºÐ° Ð¿Ð¾ÑÐ»Ðµ ÑÑŠÐµÐ´Ð°Ð½Ð¸Ñ
+	empty(X2, Y2).					% ÑƒÐ´Ð¾ÑÑ‚Ð¾Ð²ÐµÑ€ÑÐµÐ¼ÑÑ, Ñ‡Ñ‚Ð¾ Ñ‚Ð°Ð¼ Ð¿ÑƒÑÑ‚Ð¾
 
-% ñúåñòü äàìêîé èç (X1, Y1) ôèãóðó (Gx, Gy) ïåðåéäÿ â (X2, Y2)
+% ÑÑŠÐµÑÑ‚ÑŒ Ð´Ð°Ð¼ÐºÐ¾Ð¹ Ð¸Ð· (X1, Y1) Ñ„Ð¸Ð³ÑƒÑ€Ñƒ (Gx, Gy) Ð¿ÐµÑ€ÐµÐ¹Ð´Ñ Ð² (X2, Y2)
 player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy):-
-	computer_figure(Gx,Gy),
+	computer_king(Gx,Gy),
 	Dx is Gx - X1,
 	Dy is Gy - Y1,
 	T1 is abs(Dx),
 	T2 is abs(Dy), 
-	T2 == T1,			                                         %Ñìåùåíèå äëÿ äàìêè(õ == ó)
-	not(player_checker_current(X1, Y1, Gx, Gy)), % åñëè íå õîä øàøêè èãðîêà
+	T2 = T1,			            % ÑÐ¼ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð´Ð»Ñ Ð´Ð°Ð¼ÐºÐ¸(Ñ… == Ñƒ)
 	next_cell(Gx, Gy, Dx, Dy, X2, Y2),
 	onboard(X2, Y2).
 
-% íàëè÷èå øàøêè, êîòîðîé ìîæíî áèòü
+% Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ ÑˆÐ°ÑˆÐºÐ¸, ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð¼Ð¾Ð¶Ð½Ð¾ Ð±Ð¸Ñ‚ÑŒ
 player_checker_can_kill(X, Y, Killed):-
 	player_checker_need_kill(X, Y, _, _, Gx, Gy),
 	not(is_member([Gx, Gy], Killed)),
 	!.
 
-% íàëè÷èå äàìêè, êîòîðîé ìîæíî áèòü
+% Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ Ð´Ð°Ð¼ÐºÐ¸, ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð¼Ð¾Ð¶Ð½Ð¾ Ð±Ð¸Ñ‚ÑŒ
 player_king_can_kill(X, Y, Killed):-
 	player_king_need_kill(X, Y, _, _, Gx, Gy),
 	not(is_member([Gx, Gy], Killed)),
 	!.
 
-% óäàëåíèå âñåõ ñúåäåíûõ ôèãóð èç ÁÄ
+% ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð²ÑÐµÑ… ÑÑŠÐµÐ´ÐµÐ½Ñ‹Ñ… Ñ„Ð¸Ð³ÑƒÑ€ Ð¸Ð· Ð‘Ð”
 player_remove_all([]):-
 	!.
 	
 player_remove_all([[X, Y] | T]):-
-	retract(computer_figure(X, Y)),
-	(retract(computer_king(X, Y)) ; !),
+	(retract(computer_checker(X, Y)) ; retract(computer_king(X, Y))),
 	player_remove_all(T).
 
-% ñúåäàòü øàøêîé ïîêà íå íàåñòñÿ
+% ÑÑŠÐµÐ´Ð°Ñ‚ÑŒ ÑˆÐ°ÑˆÐºÐ¾Ð¹ Ð¿Ð¾ÐºÐ° Ð½Ðµ Ð½Ð°ÐµÑÑ‚ÑÑ
 player_checker_can_continue(X2, Y2, X2, Y2, L):-
 	not(player_checker_can_kill(X2, Y2, L)),
 	player_remove_all(L),
@@ -147,7 +133,7 @@ player_checker_can_continue(X1, Y1, X2, Y2, Killed):-
 	not(is_member([Gx, Gy], Killed)),
 	player_checker_can_continue(Ex1, Ey1, X2, Y2, [[Gx, Gy] | Killed]).
 
-% ñúåäàòü äàìêîé ïîêà íå íàåñòñÿ
+% ÑÑŠÐµÐ´Ð°Ñ‚ÑŒ Ð´Ð°Ð¼ÐºÐ¾Ð¹ Ð¿Ð¾ÐºÐ° Ð½Ðµ Ð½Ð°ÐµÑÑ‚ÑÑ
 player_king_can_continue(X2, Y2, X2, Y2, L):-
 	not(player_king_can_kill(X2, Y2, L)),
 	player_remove_all(L),
@@ -158,70 +144,61 @@ player_king_can_continue(X1,Y1,X2,Y2,Killed):-
 	not(is_member([Gx, Gy], Killed)),
 	player_king_can_continue(Ex1, Ey1, X2, Y2, [[Gx, Gy] | Killed]).
 
-% ó èãðîêà åñòü õîä øàøêîé èç (X1, Y1) â (X2, Y2)
+% Ñƒ Ð¸Ð³Ñ€Ð¾ÐºÐ° ÐµÑÑ‚ÑŒ Ñ…Ð¾Ð´ ÑˆÐ°ÑˆÐºÐ¾Ð¹ Ð¸Ð· (X1, Y1) Ð² (X2, Y2)
 player_move(X1, Y1, X2, Y2):-
-	player_figure(X1, Y1),
-	not(player_king(X1, Y1)),
+	player_checker(X1, Y1),
 	player_checker_need_kill(X1, Y1, Ex1, Ey1, Gx, Gy),
 	player_checker_can_continue(Ex1, Ey1, X2, Y2, [[Gx, Gy]]),
-	retract(player_figure(X1, Y1)),
-	assert(player_figure(X2, Y2)),
+	retract(player_checker(X1, Y1)),
+	assert(player_checker(X2, Y2)),
 	player_try_to_get_king(X2,Y2).
 
 player_move(X1, Y1, X2, Y2):-
-	player_figure(X1, Y1),
-	not(player_king(X1, Y1)),
+	player_checker(X1, Y1),
 	not(player_need_to_kill),
 	empty(X2, Y2),
 	T1 is X2 - X1, 
-	T1 == -1,
+	T1 = -1,
 	T2 is abs(Y2 - Y1),
-	T2 == 1,
+	T2 = 1,
 	onboard(X2, Y2),
-	retract(player_figure(X1, Y1)),
-	assert(player_figure(X2, Y2)),
+	retract(player_checker(X1, Y1)),
+	assert(player_checker(X2, Y2)),
 	player_try_to_get_king(X2, Y2).
 
 player_move(X1, Y1, X2, Y2):-
 	player_king(X1, Y1),
 	player_king_need_kill(X1, Y1, Ex1, Ey1, Gx, Gy),
 	player_king_can_continue(Ex1, Ey1, X2, Y2, [[Gx, Gy]]),
-	retract(player_figure(X1, Y1)),
-	assert(player_figure(X2, Y2)),
 	retract(player_king(X1, Y1)),
 	assert(player_king(X2, Y2)).
 
-% õîä äàìêîé
+% Ñ…Ð¾Ð´ Ð´Ð°Ð¼ÐºÐ¾Ð¹
 player_move(X1, Y1, X2, Y2):-
-	player_king(X1, Y1),			  % Äàìêà
-	not(player_need_to_kill),		% Íå íàäî íèêîãî ñúåäàòü
-	empty(X2, Y2),					    % Â êëåòêå ïóñòî
-	T1 is abs(X2 - X1),		% Ñìåùåíèå ïî õ
-	T2 is abs(Y2 - Y1),	     % è ó
-	T1 is T2,						        % ðàâíîå.
-	onboard(X2, Y2),				    % Êëåòêà íà ñòîëå(îïÿòü æå, êàæåòñÿ, ÷òî íå òàì, ãäå íàäî)
-	retract(player_figure(X1, Y1)),	% Óäàëèòü äàííûå î øàøêå
-	assert(player_figure(X2, Y2)),	% Çàïèñàòü äàííûå î øàøêå 
-	retract(player_king(X1, Y1)),	 % Óäàëèòü äàííûå î äàìêå
-	assert(player_king(X2, Y2)).	% Çàïèñàòü äàííûå î äàìêå
+	player_king(X1, Y1),			    % Ð´Ð°Ð¼ÐºÐ°
+	not(player_need_to_kill),		    % Ð½Ðµ Ð½Ð°Ð´Ð¾ Ð½Ð¸ÐºÐ¾Ð³Ð¾ ÑÑŠÐµÐ´Ð°Ñ‚ÑŒ
+	empty(X2, Y2),					    % Ð² ÐºÐ»ÐµÑ‚ÐºÐµ Ð¿ÑƒÑÑ‚Ð¾
+	T1 is abs(X2 - X1),		            % cÐ¼ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð¿Ð¾ Ñ…
+	T2 is abs(Y2 - Y1),	                % Ð¸ Ñƒ
+	T1 = T2,						    % Ñ€Ð°Ð²Ð½Ð¾Ðµ
+	onboard(X2, Y2),				    % ÐšÐ»ÐµÑ‚ÐºÐ° Ð½Ð° ÑÑ‚Ð¾Ð»Ðµ(Ð¾Ð¿ÑÑ‚ÑŒ Ð¶Ðµ, ÐºÐ°Ð¶ÐµÑ‚ÑÑ, Ñ‡Ñ‚Ð¾ Ð½Ðµ Ñ‚Ð°Ð¼, Ð³Ð´Ðµ Ð½Ð°Ð´Ð¾)
+	retract(player_king(X1, Y1)),	    % Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ Ð´Ð°Ð½Ð½Ñ‹Ðµ Ð¾ Ð´Ð°Ð¼ÐºÐµ
+	assert(player_king(X2, Y2)).	    % Ð—Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ Ð´Ð°Ð½Ð½Ñ‹Ðµ Ð¾ Ð´Ð°Ð¼ÐºÐµ
 
-% èãðîê ìîæåò ñúåñòü êîãî-íèáóäü
+% Ð¸Ð³Ñ€Ð¾Ðº Ð¼Ð¾Ð¶ÐµÑ‚ ÑÑŠÐµÑÑ‚ÑŒ ÐºÐ¾Ð³Ð¾-Ð½Ð¸Ð±ÑƒÐ´ÑŒ
 player_need_to_kill:-
-	player_figure(X, Y),
-	(player_checker_can_kill(X, Y, []) ; (player_king(X, Y), player_king_can_kill(X, Y, []))).
+	(player_checker(X, Y), player_checker_can_kill(X, Y, []) ; (player_king(X, Y), player_king_can_kill(X, Y, []))).
 	
-% îïðåäåëåíèå íàïðàâëåíèé õîäîâ (X2, Y2) äëÿ ôèãóðû èç (X1, Y1)
-player_can_move(X1, Y1, X2, Y2):-     % øàøêà â 2õ íàïðàâëåíèÿõ
-	player_figure(X1, Y1),
-	not(player_king(X1, Y1)),
+% Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ð¹ Ñ…Ð¾Ð´Ð¾Ð² (X2, Y2) Ð´Ð»Ñ Ñ„Ð¸Ð³ÑƒÑ€Ñ‹ Ð¸Ð· (X1, Y1)
+player_can_move(X1, Y1, X2, Y2):-     % ÑˆÐ°ÑˆÐºÐ° Ð² 2Ñ… Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸ÑÑ…
+	player_checker(X1, Y1),
 	X2 is X1 - 1,
 	Y2 is Y1 - 1.
 player_can_move(X1, Y1, X2, Y2):-
-	player_figure(X1, Y1),
-	not(player_king(X1, Y1)),
+	player_checker(X1, Y1),
 	X2 is X1 - 1,
 	Y2 is Y1 + 1.
-player_can_move(X1, Y1, X2, Y2):-     % äàìêà â 4õ íàïðàâëåíèÿõ 
+player_can_move(X1, Y1, X2, Y2):-     % Ð´Ð°Ð¼ÐºÐ° Ð² 4Ñ… Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸ÑÑ… 
 	player_king(X1, Y1),
 	X2 is X1 + 1,
 	Y2 is Y1 + 1.
@@ -239,8 +216,7 @@ player_can_move(X1, Y1, X2, Y2):-
 	Y2 is Y1 - 1.
 	
 player_try_move(X1, Y1):-
-	player_figure(X1,Y1),
-	not(player_king(X1,Y1)),
+	player_checker(X1,Y1),
 	player_checker_need_kill(X1, Y1, X2, Y2, Px1, Py1),
 	!.
 player_try_move(X1, Y1):-
@@ -248,26 +224,25 @@ player_try_move(X1, Y1):-
 	player_king_need_kill(X1, Y1, X2, Y2, Px1, Py1),
 	!.
 player_try_move(X1, Y1):-
-	player_figure(X1, Y1),
+	player_checker(X1, Y1),
 	player_can_move(X1, Y1, X2, Y2),
 	empty(X2, Y2).	
-	
-%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! AI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
-	
-% êîìïüþòåð ìîæåò áèòü, õîäÿ èç (X1, Y1) â (X2, Y2), ñúåäàÿ (Gx, Gy)
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! AI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+% ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ð¸Ñ‚ÑŒ, Ñ…Ð¾Ð´Ñ Ð¸Ð· (X1, Y1) Ð² (X2, Y2), ÑÑŠÐµÐ´Ð°Ñ (Gx, Gy)
 computer_checker_need_kill(X1, Y1, X2, Y2, Gx, Gy):-
-	player_figure(Gx, Gy),
+	player_checker(Gx, Gy),
 	Dx is Gx - X1,
 	Dy is Gy - Y1,
 	T1 is abs(Dx), 
-	T1 is 1,	   % ïðîâåðêà, íàõîäèòñÿ ëè âðàæåñêàÿ øàøêà ðÿäîì
+	T1 = 1,	                    % Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ°, Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð»Ð¸ Ð²Ñ€Ð°Ð¶ÐµÑÐºÐ°Ñ ÑˆÐ°ÑˆÐºÐ° Ñ€ÑÐ´Ð¾Ð¼
 	T2 is abs(Dy), 
-	T2 is 1,
-	X2 is Gx + Dx,			    % X2 âû÷èñëÿåòñÿ êàê ñìåùåíèå íà Dx
-	Y2 is Gy + Dy, 		        % Y2 âû÷èñëÿåòñÿ êàê ñìåùåíèå íà Dy
+	T2 = 1,
+	X2 is Gx + Dx,			    % X2 Ð²Ñ‹Ñ‡Ð¸ÑÐ»ÑÐµÑ‚ÑÑ ÐºÐ°Ðº ÑÐ¼ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð½Ð° Dx
+	Y2 is Gy + Dy, 		        % Y2 Ð²Ñ‹Ñ‡Ð¸ÑÐ»ÑÐµÑ‚ÑÑ ÐºÐ°Ðº ÑÐ¼ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð½Ð° Dy
 	empty(X2, Y2).
 
-% ñúåäàòü øàøêîé ïîêà íå íàåñòñÿ
+% ÑÑŠÐµÐ´Ð°Ñ‚ÑŒ ÑˆÐ°ÑˆÐºÐ¾Ð¹ Ð¿Ð¾ÐºÐ° Ð½Ðµ Ð½Ð°ÐµÑÑ‚ÑÑ
 computer_checker_can_continue(X2, Y2, X2, Y2, L):-
 	not(computer_checker_can_kill(X2, Y2, L)),
 	computer_remove_all(L),
@@ -275,27 +250,25 @@ computer_checker_can_continue(X2, Y2, X2, Y2, L):-
 	
 computer_checker_can_continue(X1, Y1, X2, Y2, Killed):-
 	computer_checker_need_kill(X1, Y1, Ex1, Ey1, Gx, Gy),
-	not(is_member([Gx, Gy], Killed)),							% ïðîâåðêà íà òî, ÷òî ýëåìåíòà Gx, Gy íåò â ñïèñêå óáèòûõ
+	not(is_member([Gx, Gy], Killed)),					% Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° Ñ‚Ð¾, Ñ‡Ñ‚Ð¾ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° Gx, Gy Ð½ÐµÑ‚ Ð² ÑÐ¿Ð¸ÑÐºÐµ ÑƒÐ±Ð¸Ñ‚Ñ‹Ñ…
 	computer_checker_can_continue(Ex1, Ey1, X2, Y2, [[Gx, Gy] | Killed]).
 
-% øàøêå êîìïüþòåðà íóæíî áèòü
+% ÑˆÐ°ÑˆÐºÐµ ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€Ð° Ð½ÑƒÐ¶Ð½Ð¾ Ð±Ð¸Ñ‚ÑŒ
 computer_checker_can_kill(X, Y, Killed):-
-	computer_checker_need_kill(X, Y, _, _, Gx, Gy),		% îïðåäåëÿåì êîîðäèíàòû øàøêè, êîòîðóþ íóæíî áèòü
-	not(is_member([Gx, Gy], Killed)),			% ïðîâåðÿåì, ÷òî îíà íå íàõîäèòñÿ â ñïèñêå óáèòûõ
+	computer_checker_need_kill(X, Y, _, _, Gx, Gy),		% Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÐ¼ ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ñ‹ ÑˆÐ°ÑˆÐºÐ¸, ÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð½ÑƒÐ¶Ð½Ð¾ Ð±Ð¸Ñ‚ÑŒ
+	not(is_member([Gx, Gy], Killed)),			        % Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼, Ñ‡Ñ‚Ð¾ Ð¾Ð½Ð° Ð½Ðµ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² ÑÐ¿Ð¸ÑÐºÐµ ÑƒÐ±Ð¸Ñ‚Ñ‹Ñ…
 	!.
 
-% îïðåäåëåíèå íàïðàâëåíèé õîäîâ (X2, Y2) äëÿ ôèãóðû èç (X1, Y1)
-computer_can_move(X1, Y1, X2, Y2):-     % øàøêà â 2õ íàïðàâëåíèÿõ
-	computer_figure(X1, Y1),
-	not(computer_king(X1, Y1)),
+% Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ð¹ Ñ…Ð¾Ð´Ð¾Ð² (X2, Y2) Ð´Ð»Ñ Ñ„Ð¸Ð³ÑƒÑ€Ñ‹ Ð¸Ð· (X1, Y1)
+computer_can_move(X1, Y1, X2, Y2):-     % ÑˆÐ°ÑˆÐºÐ° Ð² 2Ñ… Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸ÑÑ…
+	computer_checker(X1, Y1),
 	X2 is X1 + 1,
 	Y2 is Y1 - 1.
 computer_can_move(X1, Y1, X2, Y2):-
-	computer_figure(X1, Y1),
-	not(computer_king(X1, Y1)),
+	computer_checker(X1, Y1),
 	X2 is X1 + 1,
 	Y2 is Y1 + 1.
-computer_can_move(X1, Y1, X2, Y2):-     % äàìêà â 4õ íàïðàâëåíèÿõ 
+computer_can_move(X1, Y1, X2, Y2):-     % Ð´Ð°Ð¼ÐºÐ° Ð² 4Ñ… Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸ÑÑ… 
 	computer_king(X1, Y1),
 	X2 is X1 + 1,
 	Y2 is Y1 + 1.
@@ -312,41 +285,55 @@ computer_can_move(X1, Y1, X2, Y2):-
 	X2 is X1 - 1,
 	Y2 is Y1 - 1.
 
-% âû÷èñëåíèå õîäà èç (X1, Y1) â (X2, Y2) òàêîãî, ÷òî èãðîêó ïðèäåòñÿ ñúåñòü
-computer_next_step_player_can_to_kill(X1, Y1, X2, Y2):-
-	retract(computer_figure(X1, Y1)),
-	assert(computer_figure(X2, Y2)),
+% Ð²Ñ‹Ñ‡Ð¸ÑÐ»ÐµÐ½Ð¸Ðµ Ñ…Ð¾Ð´Ð° ÑˆÐ°ÑˆÐºÐ¾Ð¹ Ð¸Ð· (X1, Y1) Ð² (X2, Y2) Ñ‚Ð°ÐºÐ¾Ð³Ð¾, Ñ‡Ñ‚Ð¾ Ð¸Ð³Ñ€Ð¾ÐºÑƒ Ð¿Ñ€Ð¸Ð´ÐµÑ‚ÑÑ ÑÑŠÐµÑÑ‚ÑŒ
+computer_checker_next_step_player_can_to_kill(X1, Y1, X2, Y2):-
+	retract(computer_checker(X1, Y1)),
+	assert(computer_checker(X2, Y2)),
 	player_need_to_kill,
-	retract(computer_figure(X2, Y2)),
-	assert(computer_figure(X1, Y1)),
+	retract(computer_checker(X2, Y2)),
+	assert(computer_checker(X1, Y1)),
 	!.
 	
-computer_next_step_player_can_to_kill(X1, Y1, X2, Y2):-
-	retract(computer_figure(X2, Y2)),
-	assert(computer_figure(X1, Y1)),
+computer_checker_next_step_player_can_to_kill(X1, Y1, X2, Y2):-
+	retract(computer_checker(X2, Y2)),
+	assert(computer_checker(X1, Y1)),
 	!,
 	fail.
 
-% ñîõðàíÿåì äàìêó â ÁÄ, åñëè êîìïüþòåð äîøåë äî íèçà øàøêîé
+% Ð²Ñ‹Ñ‡Ð¸ÑÐ»ÐµÐ½Ð¸Ðµ Ñ…Ð¾Ð´Ð° Ð´Ð°Ð¼ÐºÐ¾Ð¹ Ð¸Ð· (X1, Y1) Ð² (X2, Y2) Ñ‚Ð°ÐºÐ¾Ð³Ð¾, Ñ‡Ñ‚Ð¾ Ð¸Ð³Ñ€Ð¾ÐºÑƒ Ð¿Ñ€Ð¸Ð´ÐµÑ‚ÑÑ ÑÑŠÐµÑÑ‚ÑŒ
+computer_king_next_step_player_can_to_kill(X1, Y1, X2, Y2):-
+	retract(computer_king(X1, Y1)),
+	assert(computer_king(X2, Y2)),
+	player_need_to_kill,
+	retract(computer_king(X2, Y2)),
+	assert(computer_king(X1, Y1)),
+	!.
+
+computer_king_next_step_player_can_to_kill(X1, Y1, X2, Y2):-
+	retract(computer_king(X2, Y2)),
+	assert(computer_king(X1, Y1)),
+	!,
+	fail.
+
+% ÑÐ¾Ñ…Ñ€Ð°Ð½ÑÐµÐ¼ Ð´Ð°Ð¼ÐºÑƒ Ð² Ð‘Ð”, ÐµÑÐ»Ð¸ ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€ Ð´Ð¾ÑˆÐµÐ» Ð´Ð¾ Ð½Ð¸Ð·Ð° ÑˆÐ°ÑˆÐºÐ¾Ð¹
 computer_try_to_get_king(7, Y2):-
-	computer_figure(7, Y2),
-	not(computer_king(7, Y2)),
+	computer_checker(7, Y2),
+	retract(computer_checker(7, Y2)),
 	assert(computer_king(7, Y2)).
 computer_try_to_get_king(_, _).
 
-% ñúåñòü äàìêîé èç (X1, Y1) ôèãóðó (Gx, Gy) ïåðåéäÿ â (X2, Y2)
+% ÑÑŠÐµÑÑ‚ÑŒ Ð´Ð°Ð¼ÐºÐ¾Ð¹ Ð¸Ð· (X1, Y1) Ñ„Ð¸Ð³ÑƒÑ€Ñƒ (Gx, Gy) Ð¿ÐµÑ€ÐµÐ¹Ð´Ñ Ð² (X2, Y2)
 computer_king_need_kill(X1, Y1, X2, Y2, Gx, Gy):-
-	player_figure(Gx, Gy),
+	player_king(Gx, Gy),
 	Dx is Gx - X1,
 	Dy is Gy - Y1,
 	T1 is abs(Dx),
 	T2 is abs(Dy),
-	T2 is T1,
-	not(player_checker_current(X1, Y1, Gx, Gy)),
+	T2 = T1,
 	next_cell(Gx, Gy, Dx, Dy, X2, Y2),
 	onboard(X2, Y2).
 
-% ñúåäàòü äàìêîé ïîêà íå íàåñòñÿ
+% ÑÑŠÐµÐ´Ð°Ñ‚ÑŒ Ð´Ð°Ð¼ÐºÐ¾Ð¹ Ð¿Ð¾ÐºÐ° Ð½Ðµ Ð½Ð°ÐµÑÑ‚ÑÑ
 computer_king_can_continue(X2, Y2, X2, Y2, L):-
 	not(computer_king_can_kill(X2, Y2, L)),
 	computer_remove_all(L),
@@ -357,15 +344,14 @@ computer_king_can_continue(X1, Y1, X2, Y2, Killed):-
 	not(is_member([Gx, Gy], Killed)),
 	computer_king_can_continue(Ex1, Ey1, X2, Y2, [[Gx, Gy1] | Killed]).
 
-% äàìêîé ìîæåò ñúåñòü
+% Ð´Ð°Ð¼ÐºÐ¾Ð¹ Ð¼Ð¾Ð¶ÐµÑ‚ ÑÑŠÐµÑÑ‚ÑŒ
 computer_king_can_kill(X, Y, Killed):-
 	computer_king_need_kill(X, Y, _, _, Gx, Gy),
 	not(is_member([Gx, Gy], Killed)),
 	!.
 
 computer_try_move(X1, Y1):-
-	computer_figure(X1,Y1),
-	not(computer_king(X1,Y1)),
+	computer_checker(X1,Y1),
 	computer_checker_need_kill(X1, Y1, X2, Y2, Px1, Py1),
 	!.
 computer_try_move(X1, Y1):-
@@ -373,78 +359,79 @@ computer_try_move(X1, Y1):-
 	computer_king_need_kill(X1, Y1, X2, Y2, Px1, Py1),
 	!.
 computer_try_move(X1, Y1):-
-	computer_figure(X1, Y1),
+	computer_checker(X1, Y1),
 	computer_can_move(X1, Y1, X2, Y2),
 	empty(X2, Y2).
 	
-% øàøêà óáèâàåò
+% ÑˆÐ°ÑˆÐºÐ° ÑƒÐ±Ð¸Ð²Ð°ÐµÑ‚
 computer_move:-
-	computer_figure(X1,Y1),		                % íà (X1, Y1) øàøêà
-	not(computer_king(X1,Y1)),
+	computer_checker(X1,Y1),		                % Ð½Ð° (X1, Y1) ÑˆÐ°ÑˆÐºÐ°
 	computer_checker_need_kill(X1, Y1, X2, Y2, Px1, Py1),
 	computer_checker_can_continue(X2, Y2, Xr, Yr, [[Px1, Py1]]),
-	retract(computer_figure(X1,Y1)),		      % óäàëåíèå äàííûõ î ïðåäûäóùåì ïîëîæåíèè øàøêè êîìïüþòåðà
-	assert(computer_figure(Xr,Yr)),		      % çàïèñü äàííûõ î íîâîì ïîëîæåíèè øàøêè êîìïüþòåðà
-	computer_try_to_get_king(Xr,Yr),			  % ïðîâåðêà íà äàìêó
+	retract(computer_checker(X1,Y1)),		        % ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¾ Ð¿Ñ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰ÐµÐ¼ Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ð¸ ÑˆÐ°ÑˆÐºÐ¸ ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€Ð°
+	assert(computer_checker(Xr,Yr)),		        % Ð·Ð°Ð¿Ð¸ÑÑŒ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¾ Ð½Ð¾Ð²Ð¾Ð¼ Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ð¸ ÑˆÐ°ÑˆÐºÐ¸ ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€Ð°
+	computer_try_to_get_king(Xr,Yr),			    % Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° Ð´Ð°Ð¼ÐºÑƒ
 	!.		  	
 
-% äàìêà óáèâàåò
+% Ð´Ð°Ð¼ÐºÐ° ÑƒÐ±Ð¸Ð²Ð°ÐµÑ‚
 computer_move:-
 	computer_king(X1,Y1),
 	computer_king_need_kill(X1, Y1, X2, Y2, Px1, Py1),
 	computer_king_can_continue(X2, Y2, Xr, Yr, [[Px1, Py1]]),
-	retract(computer_figure(X1, Y1)),
-	assert(computer_figure(Xr, Yr)),
 	retract(computer_king(X1, Y1)),
 	assert(computer_king(Xr, Yr)),
 	!.
 
-% äàìêà óìíî õîäèò
+% Ð´Ð°Ð¼ÐºÐ° ÑƒÐ¼Ð½Ð¾ Ñ…Ð¾Ð´Ð¸Ñ‚
 computer_move:-
 	computer_king(X1, Y1),
 	computer_can_move(X1, Y1, X21, Y21),
 	empty(X2, Y2),        
-	computer_next_step_player_can_to_kill(X1, Y1, X2, Y2),
-	retract(computer_figure(X1, Y1)),
-	assert(computer_figure(X2, Y2)),
+	computer_king_next_step_player_can_to_kill(X1, Y1, X2, Y2),
 	retract(computer_king(X1, Y1)),
 	assert(computer_king(X2, Y2)),
 	!.
 
-% øàøêà õîäèò èç X1 Y1 â X2 Y2
+% ÑˆÐ°ÑˆÐºÐ° Ñ…Ð¾Ð´Ð¸Ñ‚ Ð¸Ð· X1 Y1 Ð² X2 Y2
 computer_move:-
-	computer_figure(X1, Y1),			      % Ôèãóðà êîìïüþòåðà íà Õ1, Ó1
-	not(computer_king(X1, Y1)),			    % Ýòî íå äàìêà
-	computer_can_move(X1, Y1, X2, Y2),	% Ïðîâåðêà íà õîäû(äëÿ øàøåê x is y is 1, äëÿ äàìîê x is y)
-	empty(X2, Y2),						           % Êëåòêà X2, Y2 ïóñòà
-	computer_next_step_player_can_to_kill(X1, Y1, X2, Y2),
-	retract(computer_figure(X1, Y1)),	   % Óäàëåíèå äàííûõ î ïðåäóùåé ïîçèöèè ïåøêè
-	assert(computer_figure(X2, Y2)),	  % Çàïèñü íîâîé ïîçèöèè
+	computer_checker(X1, Y1),			    % ÑˆÐ°ÑˆÐºÐ° ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€Ð° Ð½Ð° Ð¥1, Ð£1
+	computer_can_move(X1, Y1, X2, Y2),	    % Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° Ñ…Ð¾Ð´Ñ‹(Ð´Ð»Ñ ÑˆÐ°ÑˆÐµÐº x is y is 1, Ð´Ð»Ñ Ð´Ð°Ð¼Ð¾Ðº x is y)
+	empty(X2, Y2),						    % ÐºÐ»ÐµÑ‚ÐºÐ° X2, Y2 Ð¿ÑƒÑÑ‚Ð°
+	computer_checker_next_step_player_can_to_kill(X1, Y1, X2, Y2),
+	retract(computer_checker(X1, Y1)),	    % ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¾ Ð¿Ñ€ÐµÐ´ÑƒÑ‰ÐµÐ¹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ ÑˆÐ°ÑˆÐºÐ¸
+	assert(computer_checker(X2, Y2)),	    % Ð·Ð°Ð¿Ð¸ÑÑŒ Ð½Ð¾Ð²Ð¾Ð¹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸
 	computer_try_to_get_king(X2, Y2).
 
-% ôèãóðà ïðîñòî õîäèò, òàê êàê ïîêà íåòó øàíñà, ÷òîáû ïîñëå õîäà êîìïüþòåðà èãðîê ñúåë ôèãóðó 
+% ÑˆÐ°ÑˆÐºÐ° Ð¿Ñ€Ð¾ÑÑ‚Ð¾ Ñ…Ð¾Ð´Ð¸Ñ‚, Ñ‚Ð°Ðº ÐºÐ°Ðº Ð¿Ð¾ÐºÐ° Ð½ÐµÑ‚Ñƒ ÑˆÐ°Ð½ÑÐ°, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿Ð¾ÑÐ»Ðµ Ñ…Ð¾Ð´Ð° ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€Ð° Ð¸Ð³Ñ€Ð¾Ðº ÑÑŠÐµÐ» Ñ„Ð¸Ð³ÑƒÑ€Ñƒ 
 computer_move:-
-	computer_figure(X1, Y1),
+	computer_checker(X1, Y1),
 	computer_can_move(X1, Y1, X2, Y2),
 	empty(X2, Y2),
-	retract(computer_figure(X1, Y1)),
-	assert(computer_figure(X2, Y2)),
-	((retract(computer_king(X1, Y1)), assert(computer_king(X2, Y2))) ; !),
+	retract(computer_checker(X1, Y1)),
+	assert(computer_checker(X2, Y2)),
 	computer_try_to_get_king(X2,Y2).
 
-% óäàëåíèå âñåõ ñúåäåíûõ ôèãóð èç ÁÄ
+% Ð´Ð°Ð¼ÐºÐ° Ð¿Ñ€Ð¾ÑÑ‚Ð¾ Ñ…Ð¾Ð´Ð¸Ñ‚, Ñ‚Ð°Ðº ÐºÐ°Ðº Ð¿Ð¾ÐºÐ° Ð½ÐµÑ‚Ñƒ ÑˆÐ°Ð½ÑÐ°, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿Ð¾ÑÐ»Ðµ Ñ…Ð¾Ð´Ð° ÐºÐ¾Ð¼Ð¿ÑŒÑŽÑ‚ÐµÑ€Ð° Ð¸Ð³Ñ€Ð¾Ðº ÑÑŠÐµÐ» Ñ„Ð¸Ð³ÑƒÑ€Ñƒ 
+computer_move:-
+	computer_king(X1, Y1),
+	computer_can_move(X1, Y1, X2, Y2),
+	empty(X2, Y2),
+	retract(computer_king(X1, Y1)),
+	assert(computer_king(X2, Y2)).
+	
+% ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð²ÑÐµÑ… ÑÑŠÐµÐ´ÐµÐ½Ñ‹Ñ… Ñ„Ð¸Ð³ÑƒÑ€ Ð¸Ð· Ð‘Ð”
 computer_remove_all([]):-
 	!.
 	
 computer_remove_all([[X, Y] | T]):-
-	retract(player_figure(X, Y)),
-	(retract(player_king(X, Y)) ; !),
+	(retract(player_checker(X, Y)) ; retract(player_king(X, Y))),
 	computer_remove_all(T).
 
-% óñëîâèÿ ïîáåäû
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WIN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+% ÑƒÑÐ»Ð¾Ð²Ð¸Ñ Ð¿Ð¾Ð±ÐµÐ´Ñ‹
 computer_win:-
-	not(computer_figure(_, _));
-	(computer_figure(_, _), not(computer_try_move(_, _))).
+	not(computer_checker(_, _));
+	(computer_checker(_, _), not(computer_try_move(_, _))).
 player_win:-
-	not(player_figure(_, _));
-	(player_figure(_, _), not(player_try_move(_, _))).
+	not(player_checker(_, _));
+	(player_checker(_, _), not(player_try_move(_, _))).
