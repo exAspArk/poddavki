@@ -23,20 +23,22 @@
 	is_member/2.
 	
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START POSITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
-computer_checker(0,5).
-player_checker(1,0).
-player_checker(5,0). 
-player_checker(5,2). 
-player_checker(5,4). 
-player_checker(5,6).
-player_checker(6,1).
-player_checker(6,3). 
-player_checker(6,5). 
-player_checker(6,7). 
-player_checker(7,0). 
-player_checker(7,2). 
-player_checker(7,4). 
-player_checker(7,6). 
+
+/* 
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Test #1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+computer_checker(2,1).
+computer_checker(3,2).
+computer_checker(1,4).
+player_checker(4,3).
+player_checker(5,4).
+test:-
+    computer_move.
+    computer_checker(3,0).
+    computer_checker(3,2).
+    computer_checker(1,4).
+    player_checker(4,3).
+    player_checker(5,4).
+*/
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 % координаты на доске
