@@ -24,12 +24,21 @@
 	
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START POSITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 
-computer_checker(3,0).
-
-player_checker(2,7).
-player_checker(4,1).
-player_checker(6,3).
-
+/* 
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Test #1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+computer_checker(2,1).
+computer_checker(3,2).
+computer_checker(1,4).
+player_checker(4,3).
+player_checker(5,4).
+test:-
+    computer_move.
+    computer_checker(3,0).
+    computer_checker(3,2).
+    computer_checker(1,4).
+    player_checker(4,3).
+    player_checker(5,4).
+*/
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 % координаты на доске
