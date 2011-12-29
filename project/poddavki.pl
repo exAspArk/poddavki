@@ -32,12 +32,21 @@ computer_checker(1,4).
 player_checker(4,3).
 player_checker(5,4).
 test:-
-    computer_move.
-    computer_checker(3,0).
-    computer_checker(3,2).
-    computer_checker(1,4).
-    player_checker(4,3).
+    computer_move,
+    computer_checker(3,0),
+    computer_checker(3,2),
+    computer_checker(1,4),
+    player_checker(4,3),
     player_checker(5,4).
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Test #2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+computer_checker(1,6).
+player_checker(1,2).
+test:-
+    player_move(1,2,0,3),
+    not(player_checker(0,3)),
+    player_king(0,3),
+    not(player_win).
 */
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
@@ -226,7 +235,7 @@ player_try_move(X1, Y1):-
 	player_king_need_kill(X1, Y1, X2, Y2, Px1, Py1),
 	!.
 player_try_move(X1, Y1):-
-	player_checker(X1, Y1),
+	(player_checker(X1, Y1) ; player_king(X1, Y1)),
 	player_can_move(X1, Y1, X2, Y2),
 	empty(X2, Y2).	
 
@@ -361,7 +370,7 @@ computer_try_move(X1, Y1):-
 	computer_king_need_kill(X1, Y1, X2, Y2, Px1, Py1),
 	!.
 computer_try_move(X1, Y1):-
-	computer_checker(X1, Y1),
+	(computer_checker(X1, Y1) ; computer_king(X1, Y1)),
 	computer_can_move(X1, Y1, X2, Y2),
 	empty(X2, Y2).
 	
@@ -432,8 +441,8 @@ computer_remove_all([[X, Y] | T]):-
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WIN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 % условия победы
 computer_win:-
-	not(computer_checker(_, _));
-	(computer_checker(_, _), not(computer_try_move(_, _))).
+	(not(computer_checker(_, _)), not(computer_king(_, _)));
+	((computer_checker(_, _) ; computer_king(_, _)), not(computer_try_move(_, _))).
 player_win:-
-	not(player_checker(_, _));
-	(player_checker(_, _), not(player_try_move(_, _))).
+    (not(player_checker(_, _)), not(player_king(_, _)));
+    ((player_checker(_, _) ; player_king(_, _)), not(player_try_move(_, _))).
