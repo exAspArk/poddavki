@@ -51,15 +51,8 @@ test:-
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Test #3 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 computer_checker(5,6).
-% computer_checker(5,2).
+computer_checker(5,2).
 player_king(7,0).
-test:-
-    player_move(6,1,1,6),
-    empty(4,3),
-    computer_checker(7,4),
-    player_king(1,6),
-    not(player_king(6,1)),
-    computer_win.
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 % координаты на доске
@@ -80,6 +73,21 @@ is_member(X, [X | List]).
 is_member(X, [Element | List]):-
 	is_member(X, List).	
 	
+% получение длины списка
+get_len_list([], N):-
+    N is 0.
+get_len_list([_ | L], N):-
+    get_len_list(L, N1),
+    N is N1 + 1.
+    
+% получение первого элемента первого элемента списка
+get_first(X, [[X1, Y1] | List]) :-
+    X is X1.
+
+% получение второго элемента первого элемента списка  
+get_second(X, [[X1, Y1] | List]):-
+    X is Y1.
+
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! PLAYER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 % сохраняем дамку в БД, если игрок дошел до верху шашкой
 player_try_to_get_king(0, Y2):-
@@ -102,28 +110,46 @@ player_checker_need_kill(X1, Y1, X2, Y2, Gx, Gy):-
 	Y2 is Gy + Dy,					% в которую должна попасть шашка после съедания
 	empty(X2, Y2).					% удостоверяемся, что там пусто
 
-% съесть дамкой из (X1, Y1) фигуру (Gx, Gy) перейдя в (X2, Y2)
+% съесть дамкой из (X1, Y1) перейдя в (X2, Y2) фигуру (Gx, Gy), 
+% где Killed - список уже убитых (чтобы не убивать их снова), From - список, где была дамка (чтобы не возвращаться)
 player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, Killed, From):-
-	(computer_checker(Gx, Gy) ; computer_king(Gx, Gy)),     % шашка компьютера на Gx, Gy
-	Dx is Gx - X1,
-	Dy is Gy - Y1,
-	T1 is abs(Dx),
-	T2 is abs(Dy), 
-	T2 = T1,			            % смещение для дамки(х == у)
-	Sx1 is sign(Dx),
-	Sy1 is sign(Dy),
-	write(0),nl,
-	write(X1),
-	write(Y1),nl,
-	write(Gx),
-	write(Gy),nl,
-	write(From),nl,nl,
-	player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, [[X1, Y1] | From]).
+	(computer_checker(Gx, Gy) ; computer_king(Gx, Gy)),     % фигура компьютера на Gx, Gy
+	
+	write(player_king_need_kill),nl,
+	write(count_killed),
+	write(N),nl,
+	write(from_point),
+    write(X1),
+    write(Y1),nl,
+    write(goaal),
+    write(Gx),
+    write(Gy),nl,
+    write(killed),
+    write(Killed),nl,
+
+    Dx is Gx - X1,
+    Dy is Gy - Y1,
+    T1 is abs(Dx),
+    T2 is abs(Dy),
+    write(equal),
+    write(T1),
+    write(T2),nl,
+    T2 = T1,			            % смещение для дамки(х == у)
+    Sx1 is sign(Dx),                % стороны смещения в направлении фигуры, которую надо съесть
+    Sy1 is sign(Dy),
+    add([X1, Y1], From, Frr),
+	get_len_list(Frr, N),
+    write(from),
+    write(From),nl,nl,
+    (
+    (N > 2, write(no));
+    (player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, Frr))
+	).
 
 /*  
     [poddavki].
     player_king_next_cell(-1,1, X,Y, 4,3, [], [6,1]).
-    player_king_need_kill(6,1, X2, Y2, 4,3, [], []).
+    player_king_need_kill(7,0, X2, Y2, 5,2, [], []).
     
     0 
     От куда
@@ -137,38 +163,71 @@ player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, Killed, From):-
     
     2
     Цель
+    С какой точки
     Убитые
 */
 
+% определение вдоль направления (Sx1, Sy1) следующей клетки (X2, Y2), куда может ступить дамка после съедения фигуры (Gx, Gy)
+% где Killed - список уже убитых (чтобы не убивать их снова), From - список, где была дамка (чтобы не возвращаться)
 player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, From):-
 	X is Gx + Sx1,					% определяем позицию, 
 	Y is Gy + Sy1,					% в которую должна попасть шашка после съедания
 	not(is_member([X, Y], From)),
 	empty(X, Y),					% удостоверяемся, что там пусто
+	add([Gx, Gy], Killed, Kill),
+    get_len_list(From, N),
 	
-    (
-    write(1),nl,
+    write(player_king_next_cell),nl,
+    write(from_killed),
+	write(N),nl,
+    write(where),
 	write(X),
 	write(Y),nl,
+	write(goaal),
 	write(Gx),
 	write(Gy),nl,
-	write(From),nl,nl,
-	player_king_can_kill(X, Y, [[Gx, Gy] | Killed], From),
-	nl, write(1), nl,
-	X2 is X,
-	Y2 is Y
-	) ; !.
-	
+	write(from),
+	write(From),nl,
+	write(killed),
+    write(Killed),nl,nl,
+    
+	(
+	(
+	N > 1,
+	get_first(X2, From),
+	get_second(Y2, From),
+	write(X2),
+	write(Y2),nl,nl
+	) ;
+    (
+	(player_king_can_kill(X, Y, Kill, From)) ; (player_king_next_cell(Sx1, Sy1, X2, Y2, X, Y, Kill, From))
+	)
+	).
+  
+add(X, L, [X | L]).
+  
 % наличие дамки, которой можно бить
 player_king_can_kill(X, Y, Killed, From):-
     (computer_checker(Gx, Gy) ; computer_king(Gx, Gy)),
     not(is_member([Gx, Gy], Killed)),
-    write(2),nl,
+    get_len_list(From, N),
+    
+    write(player_king_can_kill),nl,
+    write(count_killed),
+	write(N),nl,
+	write(goaal),
     write(Gx),
     write(Gy),nl,
+    write(from_point),
+    write(X),
+    write(Y),nl,
+    write(killed),
     write(Killed),nl,nl,
-	player_king_need_kill(X, Y, _, _, Gx, Gy, Killed, From),
-	!, fail.	
+    
+	(
+	(N > 1, write(222)) ;
+	(player_king_need_kill(X, Y, _, _, Gx, Gy, Killed, From))
+	).	
 	
 % наличие шашки, которой можно бить
 player_checker_can_kill(X, Y, Killed):-
