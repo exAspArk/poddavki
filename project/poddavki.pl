@@ -47,7 +47,6 @@ test:-
     not(player_checker(0,3)),
     player_king(0,3),
     not(player_win).
-*/
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Test #3 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 computer_checker(3,2).
@@ -61,6 +60,22 @@ test:-
     empty(5,0),
     player_king(4,7).
     computer_checker(0,7).
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Test #4 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+player_checker(3,4).
+player_checker(1,0).
+player_checker(2,1).
+player_checker(6,3).
+computer_king(1,6).
+test:-
+    computer_move,
+    empty(3,4),
+    empty(6,3),
+    player_checker(1,0),
+    player_checker(2,1),
+    empty(1,6),
+    computer_king(7,4).
+*/
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 % координаты на доске
@@ -139,7 +154,7 @@ player_checker_need_kill(X1, Y1, X2, Y2, Gx, Gy):-
 	Y2 is Gy + Dy,					% в которую должна попасть шашка после съедания
 	empty(X2, Y2).					% удостоверяемся, что там пусто
 
-find_figure(Killed):-
+player_figure_in(Killed):-
     (computer_checker(Gx, Gy) ; computer_king(Gx, Gy)),
     is_member([Gx, Gy], Killed).
 
@@ -181,9 +196,9 @@ player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, From):-
     	) ;
     	(                           % если некуда шагать, конец
     	    get_len_list(FromNew, N),
-    	    N > 1,
+    	    N > 0,
     	    penultimate(List, FromNew),
-        	find_figure(KilledNew),
+        	player_figure_in(KilledNew),
         	X2 is X,
         	Y2 is Y,
         	player_remove_all(KilledNew)
@@ -423,6 +438,10 @@ computer_try_move(X1, Y1):-
 	computer_can_move(X1, Y1, X2, Y2),
 	empty(X2, Y2).
 	
+computer_figure_in(Killed):-
+    (player_checker(Gx, Gy) ; player_king(Gx, Gy)),
+    is_member([Gx, Gy], Killed).
+		
 % съесть дамкой из (X1, Y1) перейдя в (X2, Y2) фигуру (Gx, Gy), 
 % где Killed - список уже убитых (чтобы не убивать их снова), From - список, где была дамка (чтобы не возвращаться)
 computer_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, Killed, From):-
@@ -461,9 +480,8 @@ computer_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, From):-
     	) ;
     	(                           % если некуда шагать, конец
     	    get_len_list(FromNew, N),
-    	    N > 1,
     	    penultimate(List, FromNew),
-        	find_figure(KilledNew),
+        	computer_figure_in(KilledNew),
         	X2 is X,
         	Y2 is Y,
         	computer_remove_all(KilledNew)
@@ -516,7 +534,8 @@ computer_move:-
 	computer_checker_next_step_player_can_to_kill(X1, Y1, X2, Y2),
 	retract(computer_checker(X1, Y1)),	    % удаление данных о предущей позиции шашки
 	assert(computer_checker(X2, Y2)),	    % запись новой позиции
-	computer_try_to_get_king(X2, Y2).
+	computer_try_to_get_king(X2, Y2), 
+	!.
 
 % шашка просто ходит, так как пока нету шанса, чтобы после хода компьютера игрок съел фигуру 
 computer_move:-
@@ -525,7 +544,8 @@ computer_move:-
 	empty(X2, Y2),
 	retract(computer_checker(X1, Y1)),
 	assert(computer_checker(X2, Y2)),
-	computer_try_to_get_king(X2,Y2).
+	computer_try_to_get_king(X2,Y2), 
+	!.
 
 % дамка просто ходит, так как пока нету шанса, чтобы после хода компьютера игрок съел фигуру 
 computer_move:-
@@ -534,7 +554,7 @@ computer_move:-
 	empty(X2, Y2),
 	retract(computer_king(X1, Y1)),
 	assert(computer_king(X2, Y2)).
-	
+		
 % удаление всех съеденых фигур из БД
 computer_remove_all([]):-
 	!.
