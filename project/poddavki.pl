@@ -75,13 +75,25 @@ test:-
     player_checker(2,1),
     empty(1,6),
     computer_king(7,4).
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Test #5 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+computer_checker(0,3).
+computer_checker(2,1).
+computer_checker(2,5).
+computer_checker(3,4).  
+player_checker(7,4).
+test:-
+    computer_move,
+    computer_checker(0,3),
+    computer_checker(2,1),
+    computer_checker(2,5),
+    computer_checker(4,3), 
+    empty(3,4),
+    player_checker(7,4).
+   
 */
-
+    
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
-% координаты на доске
-onboard(X, Y):-
-   X > -1, X < 8, Y > -1, Y < 8.
-
 % клетка пуста
 empty(X, Y):-
 	onboard(X, Y),
@@ -90,6 +102,10 @@ empty(X, Y):-
 	not(computer_king(X, Y)),
 	not(player_king(X, Y)),
 	!.
+
+% координаты на доске
+onboard(X, Y):-
+   X > -1, X < 8, Y > -1, Y < 8.
 
 % проверка, есть ли элемент X в большом списке []
 is_member(X, [X | List]).
@@ -539,12 +555,11 @@ computer_move:-
 
 % шашка просто ходит, так как пока нету шанса, чтобы после хода компьютера игрок съел фигуру 
 computer_move:-
-	computer_checker(X1, Y1),
-	computer_can_move(X1, Y1, X2, Y2),
+    computer_checker_go_first(6, Y, X2, Y2),
 	empty(X2, Y2),
-	retract(computer_checker(X1, Y1)),
+	retract(computer_checker(X, Y)),
 	assert(computer_checker(X2, Y2)),
-	computer_try_to_get_king(X2,Y2), 
+	computer_try_to_get_king(X2,Y2),
 	!.
 
 % дамка просто ходит, так как пока нету шанса, чтобы после хода компьютера игрок съел фигуру 
@@ -554,6 +569,13 @@ computer_move:-
 	empty(X2, Y2),
 	retract(computer_king(X1, Y1)),
 	assert(computer_king(X2, Y2)).
+
+% приоритет ходьбы у первого фронта пешек компьютера, чтобы занять как можно больше территории
+computer_checker_go_first(X, Y, X2, Y2):-
+    (
+        (computer_checker(X, Y), computer_can_move(X, Y, X2, Y2)) ;
+    	(X1 is X - 1, computer_checker_go_first(X1, Y, X2, Y2))
+    ), !.
 		
 % удаление всех съеденых фигур из БД
 computer_remove_all([]):-
