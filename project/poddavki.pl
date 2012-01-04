@@ -23,8 +23,47 @@
 	is_member/2.
 	
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START POSITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+computer_checker(2,1).
+player_checker(5,2).
+player_checker(5,4).
+player_checker(5,6).
 
-/* 
+/*
+computer_checker(2,1).
+computer_checker(0,3).
+computer_checker(0,5).
+computer_checker(0,7).
+player_checker(7,0).
+player_checker(7,2).
+player_checker(5,0).
+player_checker(7,6).
+
+computer_checker(0,1).
+computer_checker(0,3).
+computer_checker(0,5).
+computer_checker(0,7).
+computer_checker(1,0).
+computer_checker(1,2).
+computer_checker(1,4).
+computer_checker(1,6).
+computer_checker(2,1).
+computer_checker(2,3).
+computer_checker(2,5).
+computer_checker(2,7).
+
+player_checker(5,0).
+player_checker(5,2).
+player_checker(5,4).
+player_checker(5,6).
+player_checker(6,1).
+player_checker(6,3).
+player_checker(6,5).
+player_checker(6,7).
+player_checker(7,0).
+player_checker(7,2).
+player_checker(7,4).
+player_checker(7,6).
+
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Test #1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 computer_checker(2,1).
 computer_checker(3,2).
@@ -555,13 +594,22 @@ computer_move:-
 
 % шашка просто ходит, так как пока нету шанса, чтобы после хода компьютера игрок съел фигуру 
 computer_move:-
-    computer_checker_go_first(6, Y, X2, Y2),
+    computer_checker_smart_go_first(6, Y, X2, Y2),
+	retract(computer_checker(X, Y)),
+	assert(computer_checker(X2, Y2)),
+	computer_try_to_get_king(X2,Y2),
+	!.
+	
+% шашка просто ходит, так как пока нету шанса, чтобы после хода компьютера игрок съел фигуру 
+computer_move:-
+	computer_checker(X1, Y1),
+	computer_can_move(X1, Y1, X2, Y2),
 	empty(X2, Y2),
 	retract(computer_checker(X, Y)),
 	assert(computer_checker(X2, Y2)),
 	computer_try_to_get_king(X2,Y2),
 	!.
-
+	
 % дамка просто ходит, так как пока нету шанса, чтобы после хода компьютера игрок съел фигуру 
 computer_move:-
 	computer_king(X1, Y1),
@@ -570,13 +618,28 @@ computer_move:-
 	retract(computer_king(X1, Y1)),
 	assert(computer_king(X2, Y2)).
 
-% приоритет ходьбы у первого фронта пешек компьютера, чтобы занять как можно больше территории
-computer_checker_go_first(X, Y, X2, Y2):-
+% приоритет ходьбы у первого фронта пешек компьютера, чтобы занять как можно больше территории, если промежуток до вражеской безопасен (> 2)
+computer_checker_smart_go_first(X, Y, X2, Y2):-
     (
-        (computer_checker(X, Y), computer_can_move(X, Y, X2, Y2)) ;
-    	(X1 is X - 1, computer_checker_go_first(X1, Y, X2, Y2))
+        (
+			computer_checker(X, Y), 
+			computer_can_move(X, Y, X2, Y2),
+			empty(X2, Y2),
+			not(player_next_step(X2, Y2))
+		) ;
+    	(X1 is X - 1, X1 >= 0, computer_checker_smart_go_first(X1, Y, X2, Y2))
     ), !.
-		
+
+player_next_step(X, Y):-
+	(player_checker(X2,Y2) ; player_king(X2,Y2)),
+	player_can_move(X2, Y2, Nx, Ny),
+	D1 is X - Nx,
+	D2 is Y - Ny,
+	T1 is abs(D1),
+	T2 is abs(D2),
+	T1 = 1,
+	T2 = 1.
+	
 % удаление всех съеденых фигур из БД
 computer_remove_all([]):-
 	!.
