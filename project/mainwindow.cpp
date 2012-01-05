@@ -64,7 +64,7 @@ void MainWindow::startNewGame() {
     this->actionStartNewGame->setEnabled(false);
 
     int i = 0, j = 0;
-    /*
+    ///*
     //обнуляем значения из базы
     for(i = 0; i < 8; i++)
         for(j = 0; j < 8; j++)
@@ -79,10 +79,10 @@ void MainWindow::startNewGame() {
         for(i = 5; i < 8; i++)
             if((i + j) % 2 == 1)
                 draughts[i][j] = WHITE;
-    }*/
+    }//*/
     try
     {
-        /*
+        ///*
         //обнуляем значения в прологе
         PlCall("retractall", PlTermv(PlCompound("computer_checker(_,_)")));
         PlCall("retractall", PlTermv(PlCompound("player_checker(_,_)")));
@@ -122,7 +122,7 @@ void MainWindow::startNewGame() {
                 }
             }
         }
-        */
+        //*/
         char str_i[5];
         char str_j[5];
         //сбрасывем новые данные в массив draughts из файла(временно).

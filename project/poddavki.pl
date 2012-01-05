@@ -224,7 +224,11 @@ player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, Killed, From, Remove):-
 	all_clear(X1, Y1, Sx1, Sy1, Gx, Gy),
 	player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, FromNew, Remove), 
     !.	
-	
+
+/*
+player_move(5,0,4,7).
+*/			
+		
 % определение вдоль направления (Sx1, Sy1) следующей клетки (X2, Y2), куда может ступить дамка после съедения фигуры (Gx, Gy)
 player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, From, Remove):-
 	X is Gx + Sx1,					% определяем позицию, 
@@ -301,24 +305,13 @@ player_move(X1, Y1, X2, Y2):-
 player_move(X1, Y1, X2, Y2):-
 	player_king(X1, Y1),
 	player_king_need_kill(X1, Y1, X3, Y3, Gx, Gy, [], [], 0),
-	
-	write(X1), write(Y1), nl,
-	write(X2), write(Y2), nl,
-	write(X3), write(Y3), nl,
-	
-	X2 = X3,
-	Y2 = Y3,
-
-	write(need), nl,
+	X3 = X2,
+	Y3 = Y2,
+	player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, [], [], 1),
 	retract(player_king(X1, Y1)),
 	assert(player_king(X2, Y2)),
-	player_king_need_kill(X1, Y1, X2, X2, Gx, Gy, [], [], 1),
-	
-	write(after), nl,
-	
-
 	!.
-
+	
 player_move(X1, Y1, X2, Y2):-
 	player_checker(X1, Y1),
 	not(player_need_kill),
@@ -346,20 +339,6 @@ player_move(X1, Y1, X2, Y2):-
 	T1 = T2,						    % равное
 	retract(player_king(X1, Y1)),	    % Удалить данные о дамке
 	assert(player_king(X2, Y2)).	    % Записать данные о дамке	
-	
-/*
-player_move(5,0,4,1).
-player_move(5,0,4,7).
-
-player_king_need_kill(5,0, 4, 7, Gx, Gy, [], [], 1).
-
-computer_checker(X,Y).
-
-computer_checker(3,2).
-computer_checker(3,6).
-computer_checker(0,7).
-
-*/	
 	
 % игрок может съесть кого-нибудь
 player_need_kill:-
