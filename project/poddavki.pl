@@ -624,7 +624,7 @@ computer_move:-
 
 % шашка просто ходит, так как пока нету шанса, чтобы после хода компьютера игрок съел фигуру 
 computer_move:-
-    computer_checker_smart_go_first(6, Y, X2, Y2),
+    computer_checker_smart_go_first(6, Y, X2, Y2, X),
 	retract(computer_checker(X, Y)),
 	assert(computer_checker(X2, Y2)),
 	computer_try_to_get_king(X2,Y2),
@@ -654,15 +654,16 @@ computer_move:-
 	assert(computer_king(X2, Y2)).
 
 % приоритет ходьбы у первого фронта пешек компьютера, чтобы занять как можно больше территории, если промежуток до вражеской безопасен (> 2)
-computer_checker_smart_go_first(X, Y, X2, Y2):-
+computer_checker_smart_go_first(X, Y, X2, Y2, G):-
     (
         (
 			computer_checker(X, Y), 
 			computer_can_move(X, Y, X2, Y2),
 			empty(X2, Y2),
-			not(player_next_step(X2, Y2))
+			not(player_next_step(X2, Y2)),
+			G is X
 		) ;
-    	(X1 is X - 1, X1 >= 0, computer_checker_smart_go_first(X1, Y, X2, Y2))
+    	(X1 is X - 1, X1 >= 0, computer_checker_smart_go_first(X1, Y, X2, Y2, G))
     ), !.
 
 player_next_step(X, Y):-
