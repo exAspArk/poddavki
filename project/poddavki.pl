@@ -24,11 +24,6 @@
 	
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START POSITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 
-computer_checker(3,2).
-computer_checker(3,6).
-computer_checker(0,7).
-player_king(5,0).
-
 /*
 computer_checker(0,1).
 computer_checker(0,3).
@@ -211,7 +206,7 @@ player_figure_in(Killed):-
 
 % съесть дамкой из (X1, Y1) перейдя в (X2, Y2) фигуру (Gx, Gy), 
 % где Killed - список уже убитых (чтобы не убивать их снова), From - список, где была дамка (чтобы не возвращаться)
-player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, Killed, From, Remove):-
+player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, Killed, From, Remove, G1, G2):-
 	(computer_checker(Gx, Gy) ; computer_king(Gx, Gy)),     % фигура компьютера на Gx, Gy
     Dx is Gx - X1,
     Dy is Gy - Y1,
@@ -222,15 +217,11 @@ player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, Killed, From, Remove):-
     Sy1 is sign(Dy),
     add([X1, Y1], From, FromNew),	
 	all_clear(X1, Y1, Sx1, Sy1, Gx, Gy),
-	player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, FromNew, Remove), 
+	player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, FromNew, Remove, G1, G2), 
     !.	
 
-/*
-player_move(5,0,4,7).
-*/			
-		
 % определение вдоль направления (Sx1, Sy1) следующей клетки (X2, Y2), куда может ступить дамка после съедения фигуры (Gx, Gy)
-player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, From, Remove):-
+player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, From, Remove, G1, G2):-
 	X is Gx + Sx1,					% определяем позицию, 
 	Y is Gy + Sy1,					% в которую должна попасть шашка после съедания
 	not(is_member([X, Y], From)),	
@@ -248,22 +239,25 @@ player_king_next_cell(Sx1, Sy1, X2, Y2, Gx, Gy, Killed, From, Remove):-
     ),
 	(
 	    (                           % шагнуть дальше, если нельзя съесть
-            player_king_can_kill(X, Y, X2, Y2, KilledNew, FromNew, Remove) ; player_king_next_cell(Sx1, Sy1, X2, Y2, X, Y, KilledNew, FromNew, Remove)
+            player_king_can_kill(X, Y, X2, Y2, KilledNew, FromNew, Remove, G1, G2) ; player_king_next_cell(Sx1, Sy1, X2, Y2, X, Y, KilledNew, FromNew, Remove, G1, G2)
     	) ;
     	(                           % если некуда шагать, конец
         	player_figure_in(KilledNew),
         	X2 is X,
         	Y2 is Y,
+			first_element(List, KilledNew),
+			first_element(G1, List),
+			second_element(G2, List),
 			((Remove = 1, player_remove_all(KilledNew)) ; !)
     	)
 	), 
 	!.
 
 % наличие дамки, которой можно бить
-player_king_can_kill(X, Y, X2, Y2, Killed, From, Remove):-
+player_king_can_kill(X, Y, X2, Y2, Killed, From, Remove, G1, G2):-
     (computer_checker(Gx, Gy) ; computer_king(Gx, Gy)),
     not(is_member([Gx, Gy], Killed)),    
-	player_king_need_kill(X, Y, X1, Y1, Gx, Gy, Killed, From, Remove),
+	player_king_need_kill(X, Y, X1, Y1, Gx, Gy, Killed, From, Remove, G1, G2),
 	X2 is X1,
 	Y2 is Y1,
 	!.	
@@ -304,13 +298,26 @@ player_move(X1, Y1, X2, Y2):-
 
 player_move(X1, Y1, X2, Y2):-
 	player_king(X1, Y1),
-	player_king_need_kill(X1, Y1, X3, Y3, Gx, Gy, [], [], 0),
-	X3 = X2,
-	Y3 = Y2,
-	player_king_need_kill(X1, Y1, X2, Y2, Gx, Gy, [], [], 1),
+	player_king_need_kill(X1, Y1, X3, Y3, Gx, Gy, [], [], 0, G1, G2),
+	between(G1, G2, X2, Y2, X3, Y3),	
+	player_king_need_kill(X1, Y1, X3, Y3, Gx, Gy, [], [], 1, _, _),
 	retract(player_king(X1, Y1)),
 	assert(player_king(X2, Y2)),
 	!.
+	
+between(G1, G2, X2, Y2, X3, Y3):-
+	T1 is sign(X2 - G1),
+	T2 is sign(Y2 - G2),
+	S1 is sign(X3 - G1),
+	S2 is sign(Y3 - G2),
+	T1 = S1, 
+	T2 = S2,
+	R1 is abs(X2 - G1),
+	R2 is abs(Y2 - G2),
+	Q1 is abs(X3 - G1),
+	Q2 is abs(Y3 - G2),	
+	R1 = R2,
+	Q1 = Q2.
 	
 player_move(X1, Y1, X2, Y2):-
 	player_checker(X1, Y1),
@@ -348,7 +355,7 @@ player_need_kill:-
 	) ; 
     (
         player_king(X, Y), 
-        player_king_can_kill(X, Y, _, _, [], [], 0)
+        player_king_can_kill(X, Y, _, _, [], [], 0, _, _)
     )), !.
 	
 % определение направлений ходов (X2, Y2) для фигуры из (X1, Y1)
@@ -383,7 +390,7 @@ player_try_move(X1, Y1):-
 	!.
 player_try_move(X1, Y1):-
 	player_king(X1, Y1),
-	player_king_need_kill(X1, Y1, X2, Y2, Px1, Py1, [], [], 0),
+	player_king_need_kill(X1, Y1, X2, Y2, Px1, Py1, [], [], 0, _, _),
 	!.
 player_try_move(X1, Y1):-
 	(player_checker(X1, Y1) ; player_king(X1, Y1)),
