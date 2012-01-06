@@ -2,20 +2,20 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-	setupUi(this);
+    setupUi(this);
 
     //кодировка
     QTextCodec::setCodecForTr(QTextCodec::codecForName("CP1251"));
 
     //обнуление шашек
-    draughts = new CheckerState * [8];
+    checkers = new CheckerState * [8];
     for(int i = 0; i < 8; i++)
-        draughts[i] = new CheckerState[8];
+        checkers[i] = new CheckerState[8];
 
     //передаём массив с шашками в отрисовку
-    this->picture->setDraughts(draughts);
+    this->picture->setCheckers(checkers);
 
-	// Signal-Slots
+    // Signal-Slots
     connect(this->actionExit,           SIGNAL(triggered()), this, SLOT(close()));
     connect(this->actionStartNewGame,   SIGNAL(triggered()), this, SLOT(startNewGame()));
     connect(this->actionEndGame,        SIGNAL(triggered()), this, SLOT(endGame()));
@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(this->picture,              SIGNAL(playerMove(int,int,int,int)), this, SLOT(player_move(int, int, int, int)));
 
     setWindowTitle(tr("Поддавки"));
-	resize(800,600);
+    resize(800,600);
 
     //инклуд файла
     putenv("SWI_HOME_DIR=C:\\Program Files (x86)\\pl");
@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     //открытие файла пролога
     try
     {
-        if(PlCall("call", PlTermv(PlCompound("consult('poddavki.pl')"))))
+        if(PlCall("call", PlTermv(PlCompound("consult('Anti-checkers.pl')"))))
             qDebug() << "database opening ok!";
         else
             qDebug() << "database opening fail!";
@@ -68,17 +68,17 @@ void MainWindow::startNewGame() {
     //обнуляем значения из базы
     for(i = 0; i < 8; i++)
         for(j = 0; j < 8; j++)
-            draughts[i][j] = NONE;
+            checkers[i][j] = NONE;
 
     //записываем данные о пешках в начальном состоянии
     for(j = 0; j < 8; j++)
     {
         for(i = 0; i < 3; i++)
             if((i + j) % 2 == 1)
-                draughts[i][j] = BLACK;
+                checkers[i][j] = BLACK;
         for(i = 5; i < 8; i++)
             if((i + j) % 2 == 1)
-                draughts[i][j] = WHITE;
+                checkers[i][j] = WHITE;
     }//*/
     try
     {
@@ -105,9 +105,9 @@ void MainWindow::startNewGame() {
                     _itoa(j, posj, 10);
 
                     //запросы
-                    if(draughts[i][j] == WHITE)
+                    if(checkers[i][j] == WHITE)
                        strcpy(assert, "player_checker");
-                    else if(draughts[i][j] == BLACK)
+                    else if(checkers[i][j] == BLACK)
                          strcpy(assert, "computer_checker");
                     else
                         continue;
@@ -125,7 +125,7 @@ void MainWindow::startNewGame() {
         //*/
         char str_i[5];
         char str_j[5];
-        //сбрасывем новые данные в массив draughts из файла(временно).
+        //сбрасывем новые данные в массив checkers из файла(временно).
         for(int i = 0; i < 8; i++)
         {
             for(int j = 0; j < 8; j++)
@@ -139,15 +139,15 @@ void MainWindow::startNewGame() {
 
                     //запросы
                     if(PlCall("player_checker", args))
-                        draughts[i][j] = WHITE;
+                        checkers[i][j] = WHITE;
                     else if(PlCall("computer_checker", args))
-                        draughts[i][j] = BLACK;
+                        checkers[i][j] = BLACK;
                     else if(PlCall("player_king", args))
-                        draughts[i][j] = WHITE_KING;
+                        checkers[i][j] = WHITE_KING;
                     else if(PlCall("computer_king", args))
-                        draughts[i][j] = BLACK_KING;
+                        checkers[i][j] = BLACK_KING;
                     else if(PlCall("empty", args))
-                        draughts[i][j] = NONE;
+                        checkers[i][j] = NONE;
                 }
             }
         }
@@ -174,7 +174,7 @@ void MainWindow::endGame() {
     //обнуляем значения из базы
     for(int i = 0; i < 8; i++)
         for(int j = 0; j < 8; j++)
-            draughts[i][j] = NONE;
+            checkers[i][j] = NONE;
 
     this->picture->gameStarted = false;
     this->picture->update();
@@ -209,7 +209,7 @@ void MainWindow::player_move(int from_i, int from_j, int to_i, int to_j)
         {
             qDebug() << "can move" << from_i << from_j << to_i << to_j;
 
-            //сбрасывем новые данные в массив draughts
+            //сбрасывем новые данные в массив checkers
             for(int i = 0; i < 8; i++)
             {
                 for(int j = 0; j < 8; j++)
@@ -223,21 +223,21 @@ void MainWindow::player_move(int from_i, int from_j, int to_i, int to_j)
 
                         //запросы
                         if(PlCall("player_checker", args))
-                            draughts[i][j] = WHITE;
+                            checkers[i][j] = WHITE;
                         else if(PlCall("computer_checker", args))
-                            draughts[i][j] = BLACK;
+                            checkers[i][j] = BLACK;
                         else if(PlCall("player_king", args))
-                            draughts[i][j] = WHITE_KING;
+                            checkers[i][j] = WHITE_KING;
                         else if(PlCall("computer_king", args))
-                            draughts[i][j] = BLACK_KING;
+                            checkers[i][j] = BLACK_KING;
                         else if(PlCall("empty", args))
-                            draughts[i][j] = NONE;
+                            checkers[i][j] = NONE;
                     }
                 }
             }
 
             for(int i = 0; i < 8; i++)
-                    qDebug() << draughts[i][0] << draughts[i][1] << draughts[i][2] << draughts[i][3] << draughts[i][4] << draughts[i][5] << draughts[i][6] << draughts[i][7];
+                    qDebug() << checkers[i][0] << checkers[i][1] << checkers[i][2] << checkers[i][3] << checkers[i][4] << checkers[i][5] << checkers[i][6] << checkers[i][7];
 
             this->picture->update();
 
@@ -273,7 +273,7 @@ void MainWindow::computer_move()
         //ходит компьютер
         PlCall("computer_move");
 
-        //сбрасывем новые данные в массив draughts
+        //сбрасывем новые данные в массив checkers
         for(int i = 0; i < 8; i++)
         {
             for(int j = 0; j < 8; j++)
@@ -287,21 +287,21 @@ void MainWindow::computer_move()
                     PlTermv args = PlTermv(PlCompound(str_i), PlCompound(str_j));
 
                     if(PlCall("player_checker", args))
-                        draughts[i][j] = WHITE;
+                        checkers[i][j] = WHITE;
                     else if(PlCall("computer_checker", args))
-                        draughts[i][j] = BLACK;
+                        checkers[i][j] = BLACK;
                     else if(PlCall("player_king", args))
-                        draughts[i][j] = WHITE_KING;
+                        checkers[i][j] = WHITE_KING;
                     else if(PlCall("computer_king", args))
-                        draughts[i][j] = BLACK_KING;
+                        checkers[i][j] = BLACK_KING;
                     else if(PlCall("empty", args))
-                        draughts[i][j] = NONE;
+                        checkers[i][j] = NONE;
                 }
             }
         }
 
         for(int i = 0; i < 8; i++)
-                qDebug() << draughts[i][0] << draughts[i][1] << draughts[i][2] << draughts[i][3] << draughts[i][4] << draughts[i][5] << draughts[i][6] << draughts[i][7];
+                qDebug() << checkers[i][0] << checkers[i][1] << checkers[i][2] << checkers[i][3] << checkers[i][4] << checkers[i][5] << checkers[i][6] << checkers[i][7];
 
         this->picture->update();
 
