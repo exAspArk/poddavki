@@ -51,7 +51,7 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
         if((i + j) % 2 == 1)
         {
             //и по белой пешке, дамке
-            if(mouseClickCount == 0 && (checkers[i][j] == WHITE || checkers[i][j] == WHITE_KING))
+            if((checkers[i][j] == WHITE || checkers[i][j] == WHITE_KING))
             {
                 selectedCelli = i;
                 selectedCellj = j;

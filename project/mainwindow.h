@@ -23,7 +23,8 @@ private slots:
     void player_move(int from_i, int from_j, int to_i, int to_j);
     void computer_move();
 private:
-    bool isGameEnded();
+    bool isComputerWin();
+    bool isPlayerWin();
     CheckerState ** checkers;   //массив с расположением фигур
 };
 
