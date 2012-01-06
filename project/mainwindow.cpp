@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     //кодировка
     QTextCodec::setCodecForTr(QTextCodec::codecForName("CP1251"));
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("CP1251"));
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("CP1251"));
 
     //обнуление шашек
     checkers = new CheckerState * [8];
@@ -25,8 +27,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setWindowTitle(tr("Поддавки"));
     resize(800,600);
 
+    char path1[] = "C:\\Program Files\\pl";
+    char path2[] = "C:\\Program Files (x86)\\pl";
+    char env[100] = "SWI_HOME_DIR=";
+
+    //переменные среды
+    if(QDir(path1).exists())
+        strcat(env, path1); //папка 1 существует
+    else if(QDir(path2).exists())
+        strcat(env, path2); //папка 2 существует
+    else
+    {
+        QMessageBox::warning(NULL, QString("Ошибка!"), QString("Не удалось найти папку с SWI-Prolog. Пожалуйста, <a href='http://www.swi-prolog.org/download/stable/bin/w32pl5105.exe'>скачайте</a> установщик и установите SWI-Prolog в стандартную папку."));
+        _exit(0);
+    }
+
+    putenv(env);
+
     //инклуд файла
-    putenv("SWI_HOME_DIR=C:\\Program Files (x86)\\pl");
     static char * av []  =  {"libpl.dll", NULL} ;
 
     if (PL_initialise(1 , av) == 0)
@@ -318,7 +336,8 @@ bool MainWindow::isComputerWin()
 {
     if(PlCall("computer_win"))
     {
-        QMessageBox::information(this, tr("Чёрные победили!"), tr("Чёрные победили!") );
+        QMessageBox::information(this, tr("Победа!"), tr("Компьютер победил!") );
+        endGame();
         return true;
     }
     else
@@ -331,7 +350,8 @@ bool MainWindow::isPlayerWin()
 {
     if(PlCall("player_win"))
     {
-        QMessageBox::information(this, tr("Белые победили!"), tr("Белые победили!") );
+        QMessageBox::information(this, tr("Победа!"), tr("Человек победил!") );
+        endGame();
         return true;
     }
     else

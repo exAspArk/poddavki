@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QTimer>
+#include <QDir>
 #include "checkerspicture.h"
 
 #include "ui_mainwindow.h"
