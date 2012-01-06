@@ -25,9 +25,9 @@ CheckersPicture::~CheckersPicture()
 
 }
 
-void CheckersPicture::setDraughts(CheckerState ** _draughts)
+void CheckersPicture::setCheckers(CheckerState ** _checkers)
 {
-    this->draughts = _draughts;
+    this->checkers = _checkers;
 }
 
 void CheckersPicture::mousePressEvent(QMouseEvent *event)
@@ -51,7 +51,7 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
         if((i + j) % 2 == 1)
         {
             //и по белой пешке, дамке
-            if(mouseClickCount == 0 && (draughts[i][j] == WHITE || draughts[i][j] == WHITE_KING))
+            if(mouseClickCount == 0 && (checkers[i][j] == WHITE || checkers[i][j] == WHITE_KING))
             {
                 selectedCelli = i;
                 selectedCellj = j;
@@ -59,12 +59,12 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
                 qDebug() << "first";
                 this->update();
             }
-            else if(mouseClickCount == 1 && draughts[i][j] == NONE)//на пустой клетке
+            else if(mouseClickCount == 1 && checkers[i][j] == NONE)//на пустой клетке
             {
                 //сигнал о перемещении c selectedcelli, selectedcellj на i, j
-                //enum CheckerState state = this->draughts[selectedCelli][selectedCellj];
-                //this->draughts[selectedCelli][selectedCellj] = NONE;
-                //this->draughts[i][j] = state;
+                //enum CheckerState state = this->checkers[selectedCelli][selectedCellj];
+                //this->checkers[selectedCelli][selectedCellj] = NONE;
+                //this->checkers[i][j] = state;
 
                 qDebug() << "second";
                 qDebug() << "emit" << selectedCelli << selectedCellj << i << j;
@@ -149,11 +149,11 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
             //на нужной клетке
             if((i + j) % 2 == 1)
             {
-                if(draughts[i][j] == WHITE)
+                if(checkers[i][j] == WHITE)
                 {
                     painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), s, s);
                 }
-                if(draughts[i][j] == WHITE_KING)
+                if(checkers[i][j] == WHITE_KING)
                 {
                     painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), s, s);
                     painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), sd, sd);
@@ -169,11 +169,11 @@ void CheckersPicture::paintEvent(QPaintEvent *event)
             //на нужной клетке
             if((i + j) % 2 == 1)
             {
-                if(draughts[i][j] == BLACK)
+                if(checkers[i][j] == BLACK)
                 {
                     painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), s, s);
                 }
-                if(draughts[i][j] == BLACK_KING) {
+                if(checkers[i][j] == BLACK_KING) {
                     painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), s, s);
                     painter.setPen(QPen(Qt::white,zoom*0.1));
                     painter.drawEllipse(QPoint(zoom * (j + 1), zoom * (i + 1)), sd, sd);

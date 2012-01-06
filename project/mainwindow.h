@@ -24,7 +24,7 @@ private slots:
     void computer_move();
 private:
     bool isGameEnded();
-    CheckerState ** draughts;   //массив с расположением фигур
+    CheckerState ** checkers;   //массив с расположением фигур
 };
 
 #endif // MAINWINDOW_H
