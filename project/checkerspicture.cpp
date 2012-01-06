@@ -55,7 +55,7 @@ void CheckersPicture::mousePressEvent(QMouseEvent *event)
             {
                 selectedCelli = i;
                 selectedCellj = j;
-                mouseClickCount++;
+                mouseClickCount = 1;
                 qDebug() << "first";
                 this->update();
             }
