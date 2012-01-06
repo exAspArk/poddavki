@@ -242,7 +242,7 @@ void MainWindow::player_move(int from_i, int from_j, int to_i, int to_j)
             this->picture->update();
 
             //если игра не закончилась, передаём ход
-            if(isGameEnded() == false)
+            if(isComputerWin() == false)
             {
                 //запуск таймера для хода компьютера
                 QTimer::singleShot(1000, this, SLOT(computer_move()));
@@ -306,7 +306,7 @@ void MainWindow::computer_move()
         this->picture->update();
 
         //проверяем, закончилась ли игра
-        isGameEnded();
+        isPlayerWin();
     }
     catch ( PlException & ex )
     {
@@ -314,18 +314,28 @@ void MainWindow::computer_move()
     }
 }
 
-bool MainWindow::isGameEnded()
+bool MainWindow::isComputerWin()
 {
     if(PlCall("computer_win"))
     {
         QMessageBox::information(this, tr("Чёрные победили!"), tr("Чёрные победили!") );
         return true;
     }
-    else if(PlCall("player_win"))
+    else
+    {
+        return false;
+    }
+}
+
+bool MainWindow::isPlayerWin()
+{
+    if(PlCall("player_win"))
     {
         QMessageBox::information(this, tr("Белые победили!"), tr("Белые победили!") );
         return true;
     }
     else
+    {
         return false;
+    }
 }
